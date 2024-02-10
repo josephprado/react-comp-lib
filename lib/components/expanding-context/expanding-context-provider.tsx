@@ -46,10 +46,10 @@ export interface ExpandingContextProviderProps {
  * @returns A context provider.
  */
 export function ExpandingContextProvider({
-  isExpanded,
+  isExpanded = false,
   children,
 }: PropsWithChildren<ExpandingContextProviderProps>) {
-  const [expanded, setExpanded] = useState<boolean>(!!isExpanded);
+  const [expanded, setExpanded] = useState<boolean>(isExpanded);
 
   return (
     <ExpandingContext.Provider value={{ expanded, setExpanded }}>
