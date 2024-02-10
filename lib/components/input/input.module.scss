@@ -1,0 +1,54 @@
+.inputContainer {
+  position: relative;
+
+  $paddingX: 0.5rem;
+  $paddingY: 0.25rem;
+
+  /*
+    If --iconSize is undefined, $iconWidth becomes -$paddingX,
+    which effectively negates the double padding on padding-left/right.
+  */
+  $iconLWidth: max(calc(var(--iconLSize, -999) * 1px), calc($paddingX * -1));
+  $iconRWidth: max(calc(var(--iconRSize, -999) * 1px), calc($paddingX * -1));
+
+  $iconLHeight: calc(var(--iconLSize, 0) * 1px);
+  $iconRHeight: calc(var(--iconRSize, 0) * 1px);
+
+  .input {
+    min-height: calc(max($iconLHeight, $iconRHeight) + calc($paddingY * 2));
+    padding-top: $paddingY;
+    padding-bottom: $paddingY;
+    padding-left: calc(($paddingX * 2) + $iconLWidth);
+    padding-right: calc(($paddingX * 2) + $iconRWidth);
+
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .iconL,
+  .iconR {
+    position: absolute;
+    margin-left: $paddingX;
+    margin-right: $paddingX;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .iconL {
+    left: 1px;
+    width: $iconLWidth;
+    height: $iconLHeight;
+  }
+
+  .iconR {
+    right: 1px;
+    width: $iconRWidth;
+    height: $iconRHeight;
+  }
+}

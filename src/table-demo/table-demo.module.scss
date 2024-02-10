@@ -1,0 +1,38 @@
+.examples {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+
+  .table {
+    border: 1px solid lightgray;
+
+    .tableHeader {
+      background-color: lightgray;
+    }
+
+    .tableRow:nth-of-type(even) {
+      background-color: whitesmoke;
+    }
+
+    .tableFooter tr td {
+      border-top: 1px solid gray;
+      grid-column: 1 / span 3;
+    }
+  }
+
+  .sortableTableHeader {
+    th:hover {
+      cursor: pointer;
+    }
+  }
+
+  .scrollableTable {
+    height: 192px;
+    overflow-y: auto;
+
+    .scrollableTableHeader {
+      position: sticky;
+      top: 0;
+    }
+  }
+}

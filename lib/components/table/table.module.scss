@@ -1,0 +1,30 @@
+.table {
+  $numCols: var(--numCols);
+  display: grid;
+  grid-template-columns: repeat($numCols, 1fr);
+
+  .tableHeader,
+  .tableHeaderTr,
+  .tableBody,
+  .tableRow,
+  .tableFooter,
+  .tableFooterTr {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / span $numCols;
+  }
+}
+
+.tableHeader .sortable {
+  user-select: none;
+
+  .tableHeaderCaret {
+    visibility: hidden;
+    margin: auto 0 auto 0.25rem;
+
+    &.up,
+    &.down {
+      visibility: visible;
+    }
+  }
+}

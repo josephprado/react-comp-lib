@@ -1,0 +1,13 @@
+.examples {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.myButton {
+  border: none;
+  padding: 0.5rem 1rem;
+  background-color: mediumseagreen;
+  color: white;
+  box-shadow: 4px 4px 4px rgb(0 0 0 / 0.1);
+}
