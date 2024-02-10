@@ -6,7 +6,8 @@ import { ExpandingContextProvider } from './expanding-context-provider';
  * {@link ExpandingContextProvider}. The `WrappedComponent` and its descendants
  * can access `ExpandingContext` via the `useExpandingContext` hook.
  *
- * @example The below example creates an expanding component that defaults to
+ * @example
+ * The below example creates an expanding component that defaults to
  * the expanded state when rendered for the first time.
  *
  * ```
