@@ -16,7 +16,7 @@ export function SkipNavDemo({ containerId }: SkipNavDemoProps) {
         <div id={styles.mainContent} tabIndex={0} className={styles.focus}>
           Click the button below. Then hit the tab key. A popup should appear
           with the text: 'Skip to main content.' Either press enter or click on
-          the popup. Once clicked focus should be transferred to this div
+          the popup. Once clicked, focus should be transferred to this div
           (indicated by a blue outline).
         </div>
         <div className={styles.buttonContainer}>
