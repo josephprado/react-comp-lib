@@ -4,6 +4,7 @@ import { OutsideClickHandlerDemo } from './outside-click-handler-demo/outside-cl
 import { ButtonDemo } from './button-demo/button-demo';
 import { InputDemo } from './input-demo/input-demo';
 import { TableDemo } from './table-demo/table-demo';
+import { ExpandingContextDemo } from './expanding-context-demo/expanding-context-demo';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <ButtonDemo />
       <InputDemo />
       <TableDemo />
+      <ExpandingContextDemo />
     </div>
   );
 }
