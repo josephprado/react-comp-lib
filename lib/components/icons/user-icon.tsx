@@ -5,7 +5,7 @@ import {
   IconProps,
 } from './icon-utils';
 
-export default function UserIcon({
+export function UserIcon({
   className,
   width = DEFAULT_ICON_WIDTH_PX,
   height = DEFAULT_ICON_HEIGHT_PX,

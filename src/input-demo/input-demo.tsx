@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Input } from '../../lib/main';
+import { DEFAULT_ICON_WIDTH_PX, Input } from '../../lib/main';
+import { UserIcon } from '../../lib/components/icons/user-icon';
 import { DemoSection } from '../components/demo-section';
 import { ExampleContainer } from '../components/example-container';
 import styles from './input-demo.module.scss';
-import UserIcon from '../../lib/components/icons/user-icon';
 
 export function InputDemo() {
   const [values, setValues] = useState<{ [key: string]: string }>({});
@@ -147,7 +147,7 @@ export function InputDemo() {
             onChange={handleChange}
             autocomplete=""
             iconL={<UserIcon />}
-            iconLSizePx={16}
+            iconLSizePx={DEFAULT_ICON_WIDTH_PX}
           />
         </ExampleContainer>
 
@@ -159,7 +159,7 @@ export function InputDemo() {
             onChange={handleChange}
             autocomplete=""
             iconR={<UserIcon />}
-            iconRSizePx={16}
+            iconRSizePx={DEFAULT_ICON_WIDTH_PX}
           />
         </ExampleContainer>
 
@@ -171,9 +171,9 @@ export function InputDemo() {
             onChange={handleChange}
             autocomplete=""
             iconL={<UserIcon />}
-            iconLSizePx={16}
+            iconLSizePx={DEFAULT_ICON_WIDTH_PX}
             iconR={<UserIcon />}
-            iconRSizePx={16}
+            iconRSizePx={DEFAULT_ICON_WIDTH_PX}
           />
         </ExampleContainer>
       </div>

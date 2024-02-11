@@ -5,7 +5,7 @@ import {
   IconProps,
 } from './icon-utils';
 
-export default function EyeIcon({
+export function EyeIcon({
   className,
   width = DEFAULT_ICON_WIDTH_PX,
   height = DEFAULT_ICON_HEIGHT_PX,
