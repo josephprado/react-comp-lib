@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import {
   ExpandingContext,
   ExpandingContextProvider,
-  ExpandingContextType,
 } from './expanding-context-provider';
 import { useExpandingContext } from './use-expanding-context';
 
-let mockExpandingContext: ExpandingContextType;
+let mockExpanded: boolean;
+const mockSetExpanded = vi.fn();
 
 vi.mock('react', async () => {
   const actual = await vi.importActual('react');
@@ -16,7 +16,10 @@ vi.mock('react', async () => {
     ...(actual as any),
     useContext: (context: any) => {
       return context.displayName === ExpandingContext.displayName
-        ? mockExpandingContext
+        ? {
+            expanded: mockExpanded,
+            setExpanded: mockSetExpanded,
+          }
         : {};
     },
   };
@@ -38,10 +41,7 @@ describe(useExpandingContext.name, () => {
   it.each([[true], [false], [undefined]])(
     'should provide access to an expanding context (isExpanded=%s)',
     async (isExpanded?: boolean) => {
-      mockExpandingContext = {
-        expanded: !!isExpanded,
-        setExpanded: vi.fn(),
-      };
+      mockExpanded = !!isExpanded;
 
       const user = userEvent.setup();
 
@@ -52,12 +52,10 @@ describe(useExpandingContext.name, () => {
       );
 
       const testComponent = screen.getByTestId('test-component');
-      expect(testComponent?.innerHTML).toEqual((!!isExpanded).toString());
+      expect(testComponent.innerHTML).toEqual((!!isExpanded).toString());
 
       await user.click(testComponent);
-      await waitFor(() =>
-        expect(mockExpandingContext.setExpanded).toHaveBeenCalledOnce(),
-      );
+      await waitFor(() => expect(mockSetExpanded).toHaveBeenCalledOnce());
     },
   );
 });

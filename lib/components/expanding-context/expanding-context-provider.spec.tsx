@@ -45,7 +45,7 @@ describe(ExpandingContextProvider.name, () => {
         </ExpandingContextProvider>,
       );
 
-      const actual = screen.getByTestId('test-component')?.innerHTML;
+      const actual = screen.getByTestId('test-component').innerHTML;
       expect(actual).toEqual((!!isExpanded).toString());
     },
   );
