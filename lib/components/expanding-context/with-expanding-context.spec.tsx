@@ -4,12 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { PropsWithChildren } from 'react';
 import { useExpandingContext } from './use-expanding-context';
 import { withExpandingContext } from './with-expanding-context';
+import { ExpandingContextType } from './expanding-context-provider';
 
 let mockExpanded: boolean;
 const mockSetExpanded = vi.fn();
 
 vi.mock('./use-expanding-context', () => ({
-  useExpandingContext: () => ({
+  useExpandingContext: (): ExpandingContextType => ({
     expanded: mockExpanded,
     setExpanded: mockSetExpanded,
   }),

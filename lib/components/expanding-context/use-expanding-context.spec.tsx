@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {
   ExpandingContext,
   ExpandingContextProvider,
+  ExpandingContextType,
 } from './expanding-context-provider';
 import { useExpandingContext } from './use-expanding-context';
 
@@ -14,13 +15,13 @@ vi.mock('react', async () => {
   const actual = await vi.importActual('react');
   return {
     ...(actual as any),
-    useContext: (context: any) => {
+    useContext: (context: any): ExpandingContextType | null => {
       return context.displayName === ExpandingContext.displayName
         ? {
             expanded: mockExpanded,
             setExpanded: mockSetExpanded,
           }
-        : {};
+        : null;
     },
   };
 });
