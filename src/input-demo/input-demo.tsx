@@ -16,6 +16,16 @@ export function InputDemo() {
   return (
     <DemoSection title="INPUT">
       <div className={styles.examples}>
+        <ExampleContainer title="Default Text Input">
+          <Input
+            type="text"
+            name="default-text-input"
+            value={values['default-text-input']}
+            onChange={handleChange}
+            autocomplete=""
+          />
+        </ExampleContainer>
+
         <ExampleContainer title="Default Password Input">
           <Input
             type="password"
@@ -36,11 +46,11 @@ export function InputDemo() {
           />
         </ExampleContainer>
 
-        <ExampleContainer title="Default Text Input">
+        <ExampleContainer title="Default Number Input">
           <Input
-            type="text"
-            name="default-text-input"
-            value={values['default-text-input']}
+            type="number"
+            name="default-number-input"
+            value={values['default-number-input']}
             onChange={handleChange}
             autocomplete=""
           />
@@ -96,16 +106,6 @@ export function InputDemo() {
           />
         </ExampleContainer>
 
-        <ExampleContainer title="Default Number Input">
-          <Input
-            type="number"
-            name="default-number-input"
-            value={values['default-number-input']}
-            onChange={handleChange}
-            autocomplete=""
-          />
-        </ExampleContainer>
-
         <ExampleContainer title="Disabled">
           <Input
             type="text"
@@ -125,6 +125,17 @@ export function InputDemo() {
             onChange={handleChange}
             autocomplete=""
             readonly
+          />
+        </ExampleContainer>
+
+        <ExampleContainer title="With Placeholder">
+          <Input
+            type="search"
+            name="with-placeholder"
+            value={values['with-placeholder']}
+            onChange={handleChange}
+            autocomplete=""
+            placeholder="Search"
           />
         </ExampleContainer>
 
@@ -163,17 +174,6 @@ export function InputDemo() {
             iconLSizePx={16}
             iconR={<UserIcon />}
             iconRSizePx={16}
-          />
-        </ExampleContainer>
-
-        <ExampleContainer title="With Placeholder">
-          <Input
-            type="search"
-            name="with-placeholder"
-            value={values['with-placeholder']}
-            onChange={handleChange}
-            autocomplete=""
-            placeholder="Search"
           />
         </ExampleContainer>
       </div>
