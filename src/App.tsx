@@ -5,6 +5,7 @@ import { ButtonDemo } from './button-demo/button-demo';
 import { InputDemo } from './input-demo/input-demo';
 import { TableDemo } from './table-demo/table-demo';
 import { ExpandingContextDemo } from './expanding-context-demo/expanding-context-demo';
+import { DataEditingContextDemo } from './data-editing-context-demo/data-editing-context-demo';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <InputDemo />
       <TableDemo />
       <ExpandingContextDemo />
+      <DataEditingContextDemo />
     </div>
   );
 }
