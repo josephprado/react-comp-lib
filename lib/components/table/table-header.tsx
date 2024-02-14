@@ -21,6 +21,7 @@ export interface TableHeaderProps<T> {
   sortKey?: SortKey<T>;
   sortDir?: SortDir;
   sortFn?: (sortKey: SortKey<T>) => void;
+  collapseCarets?: boolean;
 }
 
 /**
@@ -38,12 +39,14 @@ export function TableHeader<T>({
   sortKey,
   sortDir,
   sortFn,
+  collapseCarets = false,
 }: TableHeaderProps<T>) {
   return (
     <thead id={id} className={clsx(styles.tableHeader, className)}>
       <tr className={styles.tableHeaderTr}>
         {cells.map(({ content, key }, i) => {
           const sortable = key && sortFn;
+          const active = sortKey === key;
           return (
             <th
               key={i}
@@ -51,15 +54,15 @@ export function TableHeader<T>({
               onClick={sortable ? () => sortFn(key) : undefined}
             >
               {content}
-              {sortable && (
+              {sortable && (!collapseCarets || active) && (
                 <span
                   className={clsx(
                     styles.tableHeaderCaret,
-                    sortKey === key && sortDir === 'up' && styles.up,
-                    sortKey === key && sortDir === 'down' && styles.down,
+                    active && sortDir === 'up' && styles.up,
+                    active && sortDir === 'down' && styles.down,
                   )}
                 >
-                  {sortDir === 'up' ? '▲' : '▼'}
+                  {sortDir === 'up' ? '▴' : '▾'}
                 </span>
               )}
             </th>

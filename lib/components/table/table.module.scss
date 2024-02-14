@@ -16,7 +16,9 @@
 }
 
 .tableHeader .sortable {
-  user-select: none;
+  &:active {
+    user-select: none;
+  }
 
   .tableHeaderCaret {
     visibility: hidden;
