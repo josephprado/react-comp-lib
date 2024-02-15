@@ -27,12 +27,6 @@
   }
 
   .scrollableTable {
-    height: 192px;
-    overflow-y: auto;
-
-    .scrollableTableHeader {
-      position: sticky;
-      top: 0;
-    }
+    grid-template-rows: auto fit-content(128px) auto;
   }
 }

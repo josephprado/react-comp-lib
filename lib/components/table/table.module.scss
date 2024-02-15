@@ -11,14 +11,23 @@
   .tableFooterTr {
     display: grid;
     grid-template-columns: subgrid;
-    grid-column: 1 / span $numCols;
+    /*
+      Add an extra column. This column is normally hidden, but when the
+      scrollbar is visible, it occupies the width of the scrollbar so that the
+      effective last column maintains its integrity.
+    */
+    grid-column: 1 / span calc($numCols + 1);
+  }
+
+  .tableBody {
+    overflow-y: auto;
+    // Prevents X-scrollbar when Y-scrollbar is visible (in Firefox).
+    overflow-x: hidden;
   }
 }
 
 .tableHeader .sortable {
-  &:active {
-    user-select: none;
-  }
+  user-select: none;
 
   .tableHeaderCaret {
     visibility: hidden;
