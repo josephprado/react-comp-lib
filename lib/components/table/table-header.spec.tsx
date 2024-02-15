@@ -63,7 +63,7 @@ describe(TableHeader.name, () => {
         </table>,
       );
 
-      const caret = dir === 'up' ? '▲' : '▼';
+      const caret = dir === 'up' ? '▴' : '▾';
       const cell = screen.getByRole('columnheader', {
         name: `${headerCells.find(({ content }) => content)?.content} ${caret}`,
       });
