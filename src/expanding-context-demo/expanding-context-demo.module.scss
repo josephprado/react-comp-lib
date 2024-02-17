@@ -20,9 +20,30 @@
     }
 
     .sometimesVisible {
+      height: 192px;
       background-color: white;
       border-radius: 0 0 0.5rem 0.5rem;
       padding: 1rem;
+      cursor: auto;
+    }
+
+    &.animated {
+      &.collapsed {
+        gap: 0;
+        transition: gap 0.25s;
+        transition-delay: 0.2s;
+      }
+
+      .sometimesVisible {
+        overflow: hidden;
+        transition: all 0.25s ease-out;
+
+        &.collapsed {
+          height: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+      }
     }
   }
 }
