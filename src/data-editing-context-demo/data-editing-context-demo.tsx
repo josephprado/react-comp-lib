@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useDataEditingContext } from '../../lib/components/data-editing/use-data-editing-context';
-import { withDataEditingContext } from '../../lib/components/data-editing/with-data-editing-context';
+import { useDataEditingContext } from '../../lib/components/data-editing-context/use-data-editing-context';
+import { withDataEditingContext } from '../../lib/components/data-editing-context/with-data-editing-context';
 import { DemoSection } from '../components/demo-section';
 import styles from './data-editing-context-demo.module.scss';
 

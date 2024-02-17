@@ -1,5 +1,3 @@
-export { Button } from './components/button/button';
-export { Input } from './components/input/input';
 export { OutsideClickHandler } from './components/outside-click-handler/outside-click-handler';
 export { SkipNav } from './components/skip-nav/skip-nav';
 export { Table } from './components/table/table';
