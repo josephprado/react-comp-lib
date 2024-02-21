@@ -4,6 +4,7 @@ import { OutsideClickHandlerDemo } from './outside-click-handler-demo/outside-cl
 import { TableDemo } from './table-demo/table-demo';
 import { ExpandingContextDemo } from './expanding-context-demo/expanding-context-demo';
 import { DataEditingContextDemo } from './data-editing-context-demo/data-editing-context-demo';
+import { WizardContextDemo } from './wizard-context-demo/wizard-context-demo';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <TableDemo />
       <ExpandingContextDemo />
       <DataEditingContextDemo />
+      <WizardContextDemo />
     </div>
   );
 }
