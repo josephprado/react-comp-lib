@@ -1,0 +1,9 @@
+.examples {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+
+  ::placeholder {
+    color: gray;
+  }
+}
