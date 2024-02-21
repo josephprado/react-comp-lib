@@ -5,6 +5,7 @@ import { TableDemo } from './table-demo/table-demo';
 import { ExpandingContextDemo } from './expanding-context-demo/expanding-context-demo';
 import { DataEditingContextDemo } from './data-editing-context-demo/data-editing-context-demo';
 import { WizardContextDemo } from './wizard-context-demo/wizard-context-demo';
+import { FormatTelUSADemo } from './format-tel-usa-demo/format-tel-usa-demo';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <ExpandingContextDemo />
       <DataEditingContextDemo />
       <WizardContextDemo />
+      <FormatTelUSADemo />
     </div>
   );
 }
