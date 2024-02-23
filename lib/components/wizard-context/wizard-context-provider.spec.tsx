@@ -103,7 +103,9 @@ describe(WizardContextProvider.name, () => {
       for (let i = 0; i < currentStep; i++) await user.click(nextStep);
 
       const stepIndex = screen.getByTestId('step-index');
-      expect(stepIndex.innerHTML).toEqual(currentStep.toString());
+      await waitFor(() =>
+        expect(stepIndex.innerHTML).toEqual(currentStep.toString()),
+      );
 
       const prevStep = screen.getByTestId('prev-step');
       await user.click(prevStep);
@@ -147,7 +149,9 @@ describe(WizardContextProvider.name, () => {
       for (let i = 0; i < currentStep; i++) await user.click(nextStep);
 
       const stepIndex = screen.getByTestId('step-index');
-      expect(stepIndex.innerHTML).toEqual(currentStep.toString());
+      await waitFor(() =>
+        expect(stepIndex.innerHTML).toEqual(currentStep.toString()),
+      );
 
       const reset = screen.getByTestId('reset');
       await user.click(reset);
