@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OutsideClickHandler } from './outside-click-handler';
 
@@ -33,7 +33,7 @@ describe(OutsideClickHandler.name, () => {
     const insideElement = screen.getByTestId('inside');
     await user.click(insideElement);
 
-    expect(mockOnOutsideClick).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockOnOutsideClick).not.toHaveBeenCalled());
   });
 
   it('should call onOutsideClick() when outside clicked', async () => {
@@ -52,6 +52,6 @@ describe(OutsideClickHandler.name, () => {
     const outsideElement = screen.getByTestId('outside');
     await user.click(outsideElement);
 
-    expect(mockOnOutsideClick).toHaveBeenCalledOnce();
+    await waitFor(() => expect(mockOnOutsideClick).toHaveBeenCalledOnce());
   });
 });
