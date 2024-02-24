@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useState } from 'react';
+import { PropsWithChildren, createContext, useMemo, useState } from 'react';
 
 export interface KeyValue {
   [key: string]: unknown;
@@ -78,10 +78,19 @@ export function DataEditingContextProvider({ children }: PropsWithChildren) {
     setUpdates({});
   };
 
+  const value = useMemo(
+    () => ({
+      editing,
+      updates,
+      handleChange,
+      openEditMode,
+      cancelEditMode,
+    }),
+    [editing, updates],
+  );
+
   return (
-    <DataEditingContext.Provider
-      value={{ editing, updates, handleChange, openEditMode, cancelEditMode }}
-    >
+    <DataEditingContext.Provider value={value}>
       {children}
     </DataEditingContext.Provider>
   );

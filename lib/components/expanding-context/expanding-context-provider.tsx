@@ -3,6 +3,7 @@ import {
   PropsWithChildren,
   SetStateAction,
   createContext,
+  useMemo,
   useState,
 } from 'react';
 
@@ -50,9 +51,10 @@ export function ExpandingContextProvider({
   children,
 }: PropsWithChildren<ExpandingContextProviderProps>) {
   const [expanded, setExpanded] = useState<boolean>(isExpanded);
+  const value = useMemo(() => ({ expanded, setExpanded }), [expanded]);
 
   return (
-    <ExpandingContext.Provider value={{ expanded, setExpanded }}>
+    <ExpandingContext.Provider value={value}>
       {children}
     </ExpandingContext.Provider>
   );

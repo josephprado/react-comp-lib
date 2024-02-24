@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useState } from 'react';
+import { PropsWithChildren, createContext, useMemo, useState } from 'react';
 import { KeyValue } from '../data-editing-context/data-editing-context-provider';
 import { useDataEditingContext } from '../data-editing-context/use-data-editing-context';
 import { withDataEditingContext } from '../data-editing-context/with-data-editing-context';
@@ -72,34 +72,32 @@ export const WizardContextProvider = withDataEditingContext(function ({
   children,
 }: PropsWithChildren) {
   const { updates, handleChange, cancelEditMode } = useDataEditingContext();
-
   const [stepIndex, setStepIndex] = useState<number>(0);
 
-  const prevStep = () => setStepIndex((prev) => Math.max(prev - 1, 0));
-  const nextStep = () => setStepIndex((prev) => prev + 1);
+  const value = useMemo(() => {
+    const prevStep = () => setStepIndex((prev) => Math.max(prev - 1, 0));
+    const nextStep = () => setStepIndex((prev) => prev + 1);
 
-  const reset = () => {
-    /*
+    const reset = () => {
+      /*
       Sets updates/values to an empty object. It also sets the editing variable
       of DataEditingContext to false, but we are not using that value so it
       does not matter.
     */
-    cancelEditMode();
-    setStepIndex(0);
-  };
+      cancelEditMode();
+      setStepIndex(0);
+    };
+    return {
+      values: updates,
+      handleChange,
+      stepIndex,
+      prevStep,
+      nextStep,
+      reset,
+    };
+  }, [cancelEditMode, handleChange, stepIndex, updates]);
 
   return (
-    <WizardContext.Provider
-      value={{
-        values: updates,
-        handleChange,
-        stepIndex,
-        prevStep,
-        nextStep,
-        reset,
-      }}
-    >
-      {children}
-    </WizardContext.Provider>
+    <WizardContext.Provider value={value}>{children}</WizardContext.Provider>
   );
 });
