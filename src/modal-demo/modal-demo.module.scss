@@ -1,0 +1,59 @@
+.examples {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.modal {
+  max-height: 60%;
+  width: 384px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid lightgray;
+  border-radius: 0.5rem;
+  background-color: white;
+  box-shadow: 4px 4px 4px rgb(0 0 0 / 0.3);
+
+  .modalDialogHeader {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    font-weight: bold;
+    background-color: whitesmoke;
+
+    button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: auto;
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      color: lightgray;
+      cursor: pointer;
+      overflow: hidden;
+
+      &:hover {
+        color: gray;
+      }
+    }
+  }
+
+  .modalDialogBody {
+    overflow: auto;
+    padding: 1rem 1rem 0;
+  }
+
+  .modalDialogControls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+
+    button {
+      width: 50%;
+    }
+  }
+}
