@@ -8,12 +8,12 @@ import { DataEditingContextProvider } from './data-editing-context-provider';
  *
  * @example
  * ```
- * function DataEditingComponent() {
+ * function WrappedComponent() {
  *   const { editing } = useDataEditingContext();
  *   console.log(editing); // false
  *   ...
  * }
- * export withDataEditingContext(DataEditingComponent);
+ * export const DataEditingComponent = withDataEditingContext(WrappedComponent);
  * ```
  * @param WrappedComponent A React component.
  * @returns A JSX element.

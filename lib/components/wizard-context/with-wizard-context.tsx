@@ -8,12 +8,12 @@ import { WizardContextProvider } from './wizard-context-provider';
  *
  * @example
  * ```
- * function WizardComponent() {
+ * function WrappedComponent() {
  *   const { stepIndex } = useWizardContext();
  *   console.log(stepIndex); // 0
  *   ...
  * }
- * export withWizardContext(WizardComponent);
+ * export const WizardComponent = withWizardContext(WrappedComponent);
  * ```
  * @param WrappedComponent A React component.
  * @returns A JSX element.
