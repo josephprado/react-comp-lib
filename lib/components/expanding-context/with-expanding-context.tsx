@@ -11,12 +11,12 @@ import { ExpandingContextProvider } from './expanding-context-provider';
  * the expanded state when rendered for the first time.
  *
  * ```
- * function ExpandingComponent() {
+ * function WrappedComponent() {
  *   const { expanded } = useExpandingContext();
  *   console.log(expanded); // true
  *   ...
  * }
- * export withExpandingContext(ExpandingComponent, true);
+ * export const ExpandingComponent = withExpandingContext(WrappedComponent, true);
  * ```
  * @param WrappedComponent A React component.
  * @param isExpanded The initial expanded state of the component.
