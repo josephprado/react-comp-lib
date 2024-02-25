@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect, useRef } from 'react';
  * Props for the {@link OutsideClickHandler} component.
  */
 export interface OutsideClickHandlerProps {
+  className?: string;
   onOutsideClick: CallableFunction;
 }
 
@@ -15,6 +16,7 @@ export interface OutsideClickHandlerProps {
  * @returns A JSX element.
  */
 export function OutsideClickHandler({
+  className,
   onOutsideClick,
   children,
 }: PropsWithChildren<OutsideClickHandlerProps>) {
@@ -32,5 +34,9 @@ export function OutsideClickHandler({
     };
   }, [onOutsideClick]);
 
-  return <div ref={ref}>{children}</div>;
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
 }
