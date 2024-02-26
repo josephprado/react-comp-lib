@@ -142,9 +142,18 @@ function WrappedComponent() {
 
       <div className={styles.buttonContainer}>
         {editing ? (
-          <button type="button" onClick={cancelEditMode}>
-            Cancel
-          </button>
+          <>
+            <button type="button" onClick={cancelEditMode}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!(updates.name as string).length}
+            >
+              Save
+            </button>
+          </>
         ) : (
           <button
             className={styles.editButton}
@@ -152,16 +161,6 @@ function WrappedComponent() {
             onClick={() => openEditMode({ name, department })}
           >
             Edit
-          </button>
-        )}
-
-        {editing && (
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={!(updates.name as string).length}
-          >
-            Save
           </button>
         )}
       </div>
