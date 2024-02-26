@@ -15,7 +15,7 @@ export interface ModalProps {
   id?: string;
 
   /**
-   * A CSS selector.
+   * A CSS class name.
    */
   className?: string;
 
@@ -28,6 +28,8 @@ export interface ModalProps {
 
   /**
    * If true, background content will be blurred.
+   *
+   * @default false
    */
   blur?: boolean;
 

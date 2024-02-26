@@ -1,0 +1,45 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 1rem;
+  border: 1px solid lightgray;
+  width: 256px;
+  text-align: left;
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      height: 3rem;
+
+      span {
+        font-weight: bold;
+      }
+    }
+
+    .buttonContainer {
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+
+      button {
+        width: 50%;
+      }
+
+      button:last-of-type {
+        margin-left: auto;
+      }
+    }
+  }
+
+  .stepCount {
+    text-align: center;
+    font-size: small;
+  }
+}

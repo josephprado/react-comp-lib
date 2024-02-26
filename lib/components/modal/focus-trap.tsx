@@ -10,7 +10,7 @@ export interface FocusTrapProps {
   id?: string;
 
   /**
-   * A CSS selector.
+   * A CSS class name.
    */
   className?: string;
 }
