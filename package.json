@@ -48,7 +48,7 @@
     "vite-plugin-dts": "^3.7.2",
     "vitest": "^1.2.2"
   },
-  "description": "Component library built using this [tutorial](https://dev.to/receter/how-to-create-a-react-component-library-using-vites-library-mode-4lma).",
+  "description": "A React component library.",
   "directories": {
     "lib": "lib"
   },
