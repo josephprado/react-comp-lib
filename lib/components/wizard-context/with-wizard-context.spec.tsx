@@ -2,23 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PropsWithChildren } from 'react';
-import {
-  DataEditingContextType,
-  KeyValue,
-} from '../data-editing-context/data-editing-context-provider';
+import { KeyValue } from '../data-editing-context/data-editing-context-provider';
 import { useWizardContext } from './use-wizard-context';
 import { WizardContextType } from './wizard-context-provider';
 import { withWizardContext } from './with-wizard-context';
-
-vi.mock('../data-editing-context/use-data-editing-context', () => ({
-  useDataEditingContext: (): DataEditingContextType => ({
-    editing: false,
-    updates: {},
-    handleChange: vi.fn(),
-    openEditMode: vi.fn(),
-    cancelEditMode: vi.fn(),
-  }),
-}));
 
 let mockValues: KeyValue;
 let mockStepIndex: number;
@@ -38,42 +25,6 @@ vi.mock('./use-wizard-context', () => ({
   }),
 }));
 
-const combineValuesIntoList = (values: KeyValue) => {
-  return Object.entries(values)
-    .map(([k, v]) => `${k}:${v as string}`)
-    .join(';');
-};
-
-function WrappedComponent({ children }: PropsWithChildren) {
-  const { values, handleChange, stepIndex, prevStep, nextStep, reset } =
-    useWizardContext();
-  return (
-    <>
-      <div data-testid="values">{combineValuesIntoList(values)}</div>
-      <button
-        data-testid="handle-change"
-        type="button"
-        onClick={() => handleChange('x', 'y')}
-      />
-      <div data-testid="step-index">{stepIndex.toString()}</div>
-      <button
-        data-testid="prev-step"
-        type="button"
-        onClick={() => prevStep()}
-      />
-      <button
-        data-testid="next-step"
-        type="button"
-        onClick={() => nextStep()}
-      />
-      <button data-testid="reset" type="button" onClick={() => reset()} />
-      {children}
-    </>
-  );
-}
-
-const TestComponent = withWizardContext(WrappedComponent);
-
 describe(withWizardContext.name, () => {
   beforeEach(() => {
     mockValues = { foo: 'bar' };
@@ -82,6 +33,12 @@ describe(withWizardContext.name, () => {
 
   it('should render the children', () => {
     const childText = 'Hello';
+
+    const TestComponent = withWizardContext(function ({
+      children,
+    }: PropsWithChildren) {
+      return <>{children}</>;
+    });
 
     render(
       <TestComponent>
@@ -93,31 +50,97 @@ describe(withWizardContext.name, () => {
     expect(child).toBeInTheDocument();
   });
 
-  it('should provide access to a wizard context', async () => {
-    const user = userEvent.setup();
+  it('should provide access to the values state', () => {
+    mockValues = { foo: 'bar' };
+
+    const combineUpdatesIntoList = (updates: KeyValue) => {
+      return Object.entries(updates)
+        .map(([k, v]) => `${k}:${v as string}`)
+        .join(';');
+    };
+
+    const TestComponent = withWizardContext(function () {
+      const { values } = useWizardContext();
+      return <div data-testid="values">{combineUpdatesIntoList(values)}</div>;
+    });
 
     render(<TestComponent />);
 
     const values = screen.getByTestId('values').innerHTML;
-    expect(values).toEqual(combineValuesIntoList(mockValues));
+    expect(values).toEqual(combineUpdatesIntoList(mockValues));
+  });
 
-    const handleChange = screen.getByTestId('handle-change');
-    await user.click(handleChange);
+  it('should provide access to the handleChange function', async () => {
+    const TestComponent = withWizardContext(function () {
+      const { handleChange } = useWizardContext();
+      return <button type="button" onClick={() => handleChange('x', 'y')} />;
+    });
+
+    const user = userEvent.setup();
+
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
     await waitFor(() => expect(mockHandleChange).toHaveBeenCalledOnce());
+  });
+
+  it('should provide access to the stepIndex state', () => {
+    mockStepIndex = 42;
+
+    const TestComponent = withWizardContext(function () {
+      const { stepIndex } = useWizardContext();
+      return <div data-testid="step-index">{stepIndex}</div>;
+    });
+
+    render(<TestComponent />);
 
     const stepIndex = screen.getByTestId('step-index').innerHTML;
     expect(stepIndex).toEqual(mockStepIndex.toString());
+  });
 
-    const prevStep = screen.getByTestId('prev-step');
-    await user.click(prevStep);
+  it('should provide access to the prevStep function', async () => {
+    const TestComponent = withWizardContext(function () {
+      const { prevStep } = useWizardContext();
+      return <button type="button" onClick={prevStep} />;
+    });
+
+    const user = userEvent.setup();
+
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
     await waitFor(() => expect(mockPrevStep).toHaveBeenCalledOnce());
+  });
 
-    const nextStep = screen.getByTestId('next-step');
-    await user.click(nextStep);
+  it('should provide access to the nextStep function', async () => {
+    const TestComponent = withWizardContext(function () {
+      const { nextStep } = useWizardContext();
+      return <button type="button" onClick={nextStep} />;
+    });
+
+    const user = userEvent.setup();
+
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
     await waitFor(() => expect(mockNextStep).toHaveBeenCalledOnce());
+  });
 
-    const reset = screen.getByTestId('reset');
-    await user.click(reset);
+  it('should provide access to the reset function', async () => {
+    const TestComponent = withWizardContext(function () {
+      const { reset } = useWizardContext();
+      return <button type="button" onClick={reset} />;
+    });
+
+    const user = userEvent.setup();
+
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
     await waitFor(() => expect(mockReset).toHaveBeenCalledOnce());
   });
 });

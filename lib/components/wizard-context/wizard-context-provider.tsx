@@ -1,7 +1,5 @@
 import { PropsWithChildren, createContext, useMemo, useState } from 'react';
 import { KeyValue } from '../data-editing-context/data-editing-context-provider';
-import { useDataEditingContext } from '../data-editing-context/use-data-editing-context';
-import { withDataEditingContext } from '../data-editing-context/with-data-editing-context';
 
 /**
  * The type of {@link WizardContext}.
@@ -55,7 +53,7 @@ export interface WizardContextType {
  */
 export const WizardContext = createContext<WizardContextType>({
   values: {},
-  handleChange: (_key: string, _value: unknown) => {},
+  handleChange: (_name: string, _value: unknown) => {},
   stepIndex: 0,
   nextStep: () => {},
   prevStep: () => {},
@@ -68,36 +66,34 @@ export const WizardContext = createContext<WizardContextType>({
  * @param props Children
  * @returns A context provider.
  */
-export const WizardContextProvider = withDataEditingContext(function ({
-  children,
-}: PropsWithChildren) {
-  const { updates, handleChange, cancelEditMode } = useDataEditingContext();
+export function WizardContextProvider({ children }: PropsWithChildren) {
+  const [values, setValues] = useState<KeyValue>({});
   const [stepIndex, setStepIndex] = useState<number>(0);
 
-  const value = useMemo(() => {
-    const prevStep = () => setStepIndex((prev) => Math.max(prev - 1, 0));
-    const nextStep = () => setStepIndex((prev) => prev + 1);
+  const handleChange = (name: string, value: unknown) => {
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const reset = () => {
-      /*
-      Sets updates/values to an empty object. It also sets the editing variable
-      of DataEditingContext to false, but we are not using that value so it
-      does not matter.
-    */
-      cancelEditMode();
-      setStepIndex(0);
-    };
+  const prevStep = () => setStepIndex((prev) => Math.max(prev - 1, 0));
+  const nextStep = () => setStepIndex((prev) => prev + 1);
+
+  const reset = () => {
+    setValues({});
+    setStepIndex(0);
+  };
+
+  const value = useMemo(() => {
     return {
-      values: updates,
+      values,
       handleChange,
       stepIndex,
       prevStep,
       nextStep,
       reset,
     };
-  }, [cancelEditMode, handleChange, stepIndex, updates]);
+  }, [stepIndex, values]);
 
   return (
     <WizardContext.Provider value={value}>{children}</WizardContext.Provider>
   );
-});
+}
