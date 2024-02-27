@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   DataEditingContext,
-  DataEditingContextProvider,
   DataEditingContextType,
   KeyValue,
 } from './data-editing-context-provider';
@@ -33,83 +32,83 @@ vi.mock('react', async () => {
   };
 });
 
-const combineUpdatesIntoList = (updates: KeyValue) => {
-  return Object.entries(updates)
-    .map(([k, v]) => `${k}:${v as string}`)
-    .join(';');
-};
-
-interface TestComponentProps {
-  name?: string;
-  value?: unknown;
-  initUpdates?: KeyValue;
-}
-
-function TestComponent({
-  name = '',
-  value = '',
-  initUpdates = {},
-}: TestComponentProps) {
-  const { editing, updates, handleChange, openEditMode, cancelEditMode } =
-    useDataEditingContext();
-
-  return (
-    <>
-      <div data-testid="editing">{editing.toString()}</div>
-      <div data-testid="updates">{combineUpdatesIntoList(updates)}</div>
-      <div
-        data-testid="handle-change"
-        onClick={() => handleChange(name, value)}
-      />
-      <div data-testid="open-edit" onClick={() => openEditMode(initUpdates)} />
-      <div data-testid="cancel-edit" onClick={() => cancelEditMode()} />
-    </>
-  );
-}
-
 describe(useDataEditingContext.name, () => {
-  it('should provide access to a data-editing context', async () => {
-    mockEditing = false;
-    mockUpdates = {
-      a: 'b',
-      c: 'd',
-    };
+  it('should provide access to the editing state', () => {
+    mockEditing = true;
 
-    const name = 'joe';
-    const value = 'schmo';
-    const initUpdates = {
-      foo: 'bar',
-      baz: 'bat',
-    };
+    function TestComponent() {
+      const { editing } = useDataEditingContext();
+      return <div data-testid="editing">{editing.toString()}</div>;
+    }
 
-    const user = userEvent.setup();
-
-    render(
-      <DataEditingContextProvider>
-        <TestComponent name={name} value={value} initUpdates={initUpdates} />
-      </DataEditingContextProvider>,
-    );
+    render(<TestComponent />);
 
     const editing = screen.getByTestId('editing').innerHTML;
     expect(editing).toEqual(mockEditing.toString());
+  });
+
+  it('should provide access to the updates state', () => {
+    mockUpdates = { foo: 'bar' };
+
+    const combineUpdatesIntoList = (updates: KeyValue) => {
+      return Object.entries(updates)
+        .map(([k, v]) => `${k}:${v as string}`)
+        .join(';');
+    };
+
+    function TestComponent() {
+      const { updates } = useDataEditingContext();
+      return <div data-testid="updates">{combineUpdatesIntoList(updates)}</div>;
+    }
+
+    render(<TestComponent />);
 
     const updates = screen.getByTestId('updates').innerHTML;
     expect(updates).toEqual(combineUpdatesIntoList(mockUpdates));
+  });
 
-    const handleChange = screen.getByTestId('handle-change');
-    await user.click(handleChange);
-    await waitFor(() =>
-      expect(mockHandleChange).toHaveBeenCalledWith(name, value),
-    );
+  it('should provide access to the handleChange function', async () => {
+    function TestComponent() {
+      const { handleChange } = useDataEditingContext();
+      return <button type="button" onClick={() => handleChange('x', 'y')} />;
+    }
 
-    const openEdit = screen.getByTestId('open-edit');
-    await user.click(openEdit);
-    await waitFor(() =>
-      expect(mockOpenEditMode).toHaveBeenCalledWith(initUpdates),
-    );
+    const user = userEvent.setup();
 
-    const cancelEdit = screen.getByTestId('cancel-edit');
-    await user.click(cancelEdit);
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
+    await waitFor(() => expect(mockHandleChange).toHaveBeenCalledOnce());
+  });
+
+  it('should provide access to the openEditMode function', async () => {
+    function TestComponent() {
+      const { openEditMode } = useDataEditingContext();
+      return <button type="button" onClick={() => openEditMode()} />;
+    }
+
+    const user = userEvent.setup();
+
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
+    await waitFor(() => expect(mockOpenEditMode).toHaveBeenCalledOnce());
+  });
+
+  it('should provide access to the cancelEditMode function', async () => {
+    function TestComponent() {
+      const { cancelEditMode } = useDataEditingContext();
+      return <button type="button" onClick={() => cancelEditMode()} />;
+    }
+
+    const user = userEvent.setup();
+
+    render(<TestComponent />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
     await waitFor(() => expect(mockCancelEditMode).toHaveBeenCalledOnce());
   });
 });

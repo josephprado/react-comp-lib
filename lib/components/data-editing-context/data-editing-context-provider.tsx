@@ -49,7 +49,7 @@ export interface DataEditingContextType {
 export const DataEditingContext = createContext<DataEditingContextType>({
   editing: false,
   updates: {},
-  handleChange: (_key: string, _value: unknown) => {},
+  handleChange: (_name: string, _value: unknown) => {},
   openEditMode: (_initUpdates?: KeyValue) => {},
   cancelEditMode: () => {},
 });

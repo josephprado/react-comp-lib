@@ -8,44 +8,6 @@ import {
   KeyValue,
 } from './data-editing-context-provider';
 
-interface TestComponentProps {
-  name?: string;
-  value?: unknown;
-  initUpdates?: KeyValue;
-}
-
-const combineUpdatesIntoList = (updates: KeyValue) => {
-  return Object.entries(updates)
-    .map(([k, v]) => `${k}:${v as string}`)
-    .join(';');
-};
-
-function TestComponent({ name, value, initUpdates }: TestComponentProps) {
-  const { editing, updates, handleChange, openEditMode, cancelEditMode } =
-    useContext(DataEditingContext);
-  return (
-    <>
-      <div
-        data-testid="editing"
-        onClick={() => {
-          editing ? cancelEditMode() : openEditMode(initUpdates);
-        }}
-      >
-        {editing.toString()}
-      </div>
-      <div
-        data-testid="value"
-        onClick={() => {
-          if (name && value) handleChange(name, value);
-        }}
-      >
-        {name && value ? (updates[name] as string) : ''}
-      </div>
-      <div data-testid="updates">{combineUpdatesIntoList(updates)}</div>
-    </>
-  );
-}
-
 describe(DataEditingContextProvider.name, () => {
   it('should render the children', () => {
     const childText = 'Hello';
@@ -61,6 +23,11 @@ describe(DataEditingContextProvider.name, () => {
   });
 
   it('should default to non-editing state', () => {
+    function TestComponent() {
+      const { editing } = useContext(DataEditingContext);
+      return <div data-testid="editing">{editing.toString()}</div>;
+    }
+
     render(
       <DataEditingContextProvider>
         <TestComponent />
@@ -72,6 +39,15 @@ describe(DataEditingContextProvider.name, () => {
   });
 
   it('should set editing to true when openEditMode called', async () => {
+    function TestComponent() {
+      const { editing, openEditMode } = useContext(DataEditingContext);
+      return (
+        <button type="button" onClick={() => openEditMode()}>
+          {editing.toString()}
+        </button>
+      );
+    }
+
     const user = userEvent.setup();
 
     render(
@@ -80,10 +56,9 @@ describe(DataEditingContextProvider.name, () => {
       </DataEditingContextProvider>,
     );
 
-    const editing = screen.getByTestId('editing');
-    await user.click(editing);
-
-    await waitFor(() => expect(editing.innerHTML).toEqual('true'));
+    const button = screen.getByRole('button');
+    await user.click(button);
+    await waitFor(() => expect(button.innerHTML).toEqual('true'));
   });
 
   it('should initialize updates with initUpdates when openEditMode called', async () => {
@@ -92,24 +67,59 @@ describe(DataEditingContextProvider.name, () => {
       baz: 'bat',
     };
 
+    const combineUpdatesIntoList = (updates: KeyValue) => {
+      return Object.entries(updates)
+        .map(([k, v]) => `${k}:${v as string}`)
+        .join(';');
+    };
+
+    function TestComponent() {
+      const { updates, openEditMode } = useContext(DataEditingContext);
+      return (
+        <button type="button" onClick={() => openEditMode(initUpdates)}>
+          {combineUpdatesIntoList(updates)}
+        </button>
+      );
+    }
+
     const user = userEvent.setup();
 
     render(
       <DataEditingContextProvider>
-        <TestComponent initUpdates={initUpdates} />
+        <TestComponent />
       </DataEditingContextProvider>,
     );
 
-    const editing = screen.getByTestId('editing');
-    await user.click(editing);
+    const button = screen.getByRole('button');
+    expect(button.innerHTML).toEqual('');
 
-    const updates = screen.getByTestId('updates').innerHTML;
+    await user.click(button);
     await waitFor(() =>
-      expect(updates).toEqual(combineUpdatesIntoList(initUpdates)),
+      expect(button.innerHTML).toEqual(combineUpdatesIntoList(initUpdates)),
     );
   });
 
   it('should set editing to false when cancelEditMode called', async () => {
+    function TestComponent() {
+      const { editing, openEditMode, cancelEditMode } =
+        useContext(DataEditingContext);
+      return (
+        <>
+          <div data-testid="editing">{editing.toString()}</div>
+          <button
+            type="button"
+            data-testid="open-edit-mode"
+            onClick={() => openEditMode()}
+          />
+          <button
+            type="button"
+            data-testid="cancel-edit-mode "
+            onClick={() => cancelEditMode()}
+          />
+        </>
+      );
+    }
+
     const user = userEvent.setup();
 
     render(
@@ -119,28 +129,51 @@ describe(DataEditingContextProvider.name, () => {
     );
 
     const editing = screen.getByTestId('editing');
-    await user.click(editing);
+
+    const openEditMode = screen.getByTestId('open-edit-mode');
+    await user.click(openEditMode);
     await waitFor(() => expect(editing.innerHTML).toEqual('true'));
 
-    await user.click(editing);
+    const cancelEditMode = screen.getByTestId('cancel-edit-mode');
+    await user.click(cancelEditMode);
     await waitFor(() => expect(editing.innerHTML).toEqual('false'));
   });
 
   it('should update the value when handleChange called', async () => {
-    const key = 'foo';
+    const combineUpdatesIntoList = (updates: KeyValue) => {
+      return Object.entries(updates)
+        .map(([k, v]) => `${k}:${v as string}`)
+        .join(';');
+    };
+
+    const name = 'foo';
     const value = 'bar';
+
+    function TestComponent() {
+      const { updates, handleChange } = useContext(DataEditingContext);
+      return (
+        <button type="button" onClick={() => handleChange(name, value)}>
+          {combineUpdatesIntoList(updates)}
+        </button>
+      );
+    }
 
     const user = userEvent.setup();
 
     render(
       <DataEditingContextProvider>
-        <TestComponent name={key} value={value} />
+        <TestComponent />
       </DataEditingContextProvider>,
     );
 
-    const valueDiv = screen.getByTestId('value');
-    await user.click(valueDiv);
+    const button = screen.getByRole('button');
+    expect(button.innerHTML).toEqual('');
 
-    await waitFor(() => expect(valueDiv.innerHTML).toEqual(value));
+    await user.click(button);
+    await waitFor(() =>
+      expect(button.innerHTML).toEqual(
+        combineUpdatesIntoList({ [name]: value }),
+      ),
+    );
   });
 });
