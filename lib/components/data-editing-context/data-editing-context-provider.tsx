@@ -69,7 +69,7 @@ export function DataEditingContextProvider({ children }: PropsWithChildren) {
   };
 
   const openEditMode = (initUpdates?: KeyValue) => {
-    setUpdates(initUpdates ?? {});
+    setUpdates(structuredClone(initUpdates) ?? {});
     setEditing(true);
   };
 
