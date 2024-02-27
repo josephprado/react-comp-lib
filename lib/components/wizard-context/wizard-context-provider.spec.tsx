@@ -1,47 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useContext } from 'react';
-import { DataEditingContextType } from '../data-editing-context/data-editing-context-provider';
 import {
   WizardContext,
   WizardContextProvider,
 } from './wizard-context-provider';
 
-vi.mock('../data-editing-context/use-data-editing-context', () => ({
-  useDataEditingContext: (): DataEditingContextType => ({
-    editing: false,
-    updates: {},
-    handleChange: vi.fn(),
-    openEditMode: vi.fn(),
-    cancelEditMode: vi.fn(),
-  }),
-}));
-
-function TestComponent() {
-  const { stepIndex, prevStep, nextStep, reset } = useContext(WizardContext);
-  return (
-    <>
-      <div data-testid="step-index">{stepIndex.toString()}</div>
-      <button
-        data-testid="prev-step"
-        type="button"
-        onClick={() => prevStep()}
-      />
-      <button
-        data-testid="next-step"
-        type="button"
-        onClick={() => nextStep()}
-      />
-      <button data-testid="reset" type="button" onClick={() => reset()} />
-    </>
-  );
-}
-
-/*
-  Note: Not testing `values` and `handleChange` as those are merely imported
-  from DataEditingContext and re-exported.
-*/
 describe(WizardContextProvider.name, () => {
   it('should render the children', () => {
     const childText = 'Hello';
@@ -57,6 +22,11 @@ describe(WizardContextProvider.name, () => {
   });
 
   it('should initiate stepIndex to 0', () => {
+    function TestComponent() {
+      const { stepIndex } = useContext(WizardContext);
+      return <div data-testid="step-index">{stepIndex}</div>;
+    }
+
     render(
       <WizardContextProvider>
         <TestComponent />
@@ -70,6 +40,15 @@ describe(WizardContextProvider.name, () => {
   it.each([[1], [2], [5], [10]])(
     'should increment stepIndex by one when nextStep called (n=%s)',
     async (n: number) => {
+      function TestComponent() {
+        const { stepIndex, nextStep } = useContext(WizardContext);
+        return (
+          <button type="button" onClick={nextStep}>
+            {stepIndex}
+          </button>
+        );
+      }
+
       const user = userEvent.setup();
 
       render(
@@ -78,19 +57,29 @@ describe(WizardContextProvider.name, () => {
         </WizardContextProvider>,
       );
 
-      const stepIndex = screen.getByTestId('step-index');
-      expect(stepIndex.innerHTML).toEqual('0');
+      const button = screen.getByRole('button');
+      expect(button.innerHTML).toEqual('0');
 
-      const nextStep = screen.getByTestId('next-step');
-      for (let i = 0; i < n; i++) await user.click(nextStep);
+      for (let i = 0; i < n; i++) await user.click(button);
 
-      await waitFor(() => expect(stepIndex.innerHTML).toEqual(n.toString()));
+      await waitFor(() => expect(button.innerHTML).toEqual(n.toString()));
     },
   );
 
   it.each([[1], [2], [5], [10]])(
     'should decrement stepIndex by one when prevStep called (currentStep=%s)',
     async (currentStep: number) => {
+      function TestComponent() {
+        const { stepIndex, prevStep, nextStep } = useContext(WizardContext);
+        return (
+          <>
+            <div data-testid="step-index">{stepIndex}</div>
+            <button type="button" data-testid="prev-step" onClick={prevStep} />
+            <button type="button" data-testid="next-step" onClick={nextStep} />
+          </>
+        );
+      }
+
       const user = userEvent.setup();
 
       render(
@@ -99,10 +88,11 @@ describe(WizardContextProvider.name, () => {
         </WizardContextProvider>,
       );
 
+      const stepIndex = screen.getByTestId('step-index');
+
       const nextStep = screen.getByTestId('next-step');
       for (let i = 0; i < currentStep; i++) await user.click(nextStep);
 
-      const stepIndex = screen.getByTestId('step-index');
       await waitFor(() =>
         expect(stepIndex.innerHTML).toEqual(currentStep.toString()),
       );
@@ -117,6 +107,15 @@ describe(WizardContextProvider.name, () => {
   );
 
   it('should not decrement stepIndex below 0 when prevStep called', async () => {
+    function TestComponent() {
+      const { stepIndex, prevStep } = useContext(WizardContext);
+      return (
+        <button type="button" onClick={prevStep}>
+          {stepIndex}
+        </button>
+      );
+    }
+
     const user = userEvent.setup();
 
     render(
@@ -125,18 +124,27 @@ describe(WizardContextProvider.name, () => {
       </WizardContextProvider>,
     );
 
-    const stepIndex = screen.getByTestId('step-index');
-    expect(stepIndex.innerHTML).toEqual('0');
+    const button = screen.getByRole('button');
+    expect(button.innerHTML).toEqual('0');
 
-    const prevStep = screen.getByTestId('prev-step');
-    await user.click(prevStep);
-
-    await waitFor(() => expect(stepIndex.innerHTML).toEqual('0'));
+    await user.click(button);
+    await waitFor(() => expect(button.innerHTML).toEqual('0'));
   });
 
   it.each([[1], [2], [5], [10]])(
     'should set stepIndex to 0 when reset called (currentStep=%s)',
     async (currentStep: number) => {
+      function TestComponent() {
+        const { stepIndex, nextStep, reset } = useContext(WizardContext);
+        return (
+          <>
+            <div data-testid="step-index">{stepIndex}</div>
+            <button type="button" data-testid="next-step" onClick={nextStep} />
+            <button type="button" data-testid="reset" onClick={reset} />
+          </>
+        );
+      }
+
       const user = userEvent.setup();
 
       render(
@@ -145,10 +153,11 @@ describe(WizardContextProvider.name, () => {
         </WizardContextProvider>,
       );
 
+      const stepIndex = screen.getByTestId('step-index');
+
       const nextStep = screen.getByTestId('next-step');
       for (let i = 0; i < currentStep; i++) await user.click(nextStep);
 
-      const stepIndex = screen.getByTestId('step-index');
       await waitFor(() =>
         expect(stepIndex.innerHTML).toEqual(currentStep.toString()),
       );
