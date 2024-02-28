@@ -13,6 +13,24 @@ describe(FocusTrap.name, () => {
     expect(child).toBeInTheDocument();
   });
 
+  it('should not escape the trap when there are no tabbable elements', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <div>
+        <button type="button">ONE</button>
+        <FocusTrap>Trap</FocusTrap>
+        <button type="button">TWO</button>
+      </div>,
+    );
+
+    for (let i = 0; i < 3; i++) {
+      await user.keyboard('{Tab}');
+      const focusEl = document.activeElement;
+      await waitFor(() => expect(focusEl?.innerHTML).toEqual('Trap'));
+    }
+  });
+
   it.each([
     [false, false, false],
     [false, false, true],

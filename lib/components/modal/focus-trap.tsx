@@ -42,12 +42,16 @@ export function FocusTrap({
             document.activeElement === trap)
         ) {
           event.preventDefault();
-          lastEl.focus();
+          lastEl?.focus();
         } else if (!event.shiftKey && document.activeElement === lastEl) {
           event.preventDefault();
-          firstEl.focus();
+          firstEl?.focus();
         }
       }
+    };
+
+    const ignoreTabKeyPress = (event: any) => {
+      if (event.key === 'Tab') event.preventDefault();
     };
 
     const trap = ref.current;
@@ -72,13 +76,20 @@ export function FocusTrap({
         (el) => !el.hasAttribute('disabled') && !el.hasAttribute('aria-hidden'),
       );
 
-      firstEl = tabbableEls[0] as HTMLElement;
-      lastEl = tabbableEls[tabbableEls.length - 1] as HTMLElement;
+      if (tabbableEls.length) {
+        firstEl = tabbableEls[0] as HTMLElement;
+        lastEl = tabbableEls[tabbableEls.length - 1] as HTMLElement;
 
-      trap.addEventListener('keydown', handleTabKeyPress);
+        trap.addEventListener('keydown', handleTabKeyPress);
+      } else {
+        trap.addEventListener('keydown', ignoreTabKeyPress);
+      }
     }
 
-    return () => trap?.removeEventListener('keydown', handleTabKeyPress);
+    return () => {
+      trap?.removeEventListener('keydown', handleTabKeyPress);
+      trap?.removeEventListener('keydown', ignoreTabKeyPress);
+    };
   }, []);
 
   return (
