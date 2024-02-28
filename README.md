@@ -428,7 +428,7 @@ An id passed to the component's root container.
 
 ##### `className`
 
-A CSS class name.
+A CSS class name applied to the element that wraps the children of the modal. To apply styles to the modal backdrop, use the `backdrop` prop.
 
 - type: string
 - default: undefined
@@ -437,18 +437,9 @@ A CSS class name.
 
 ##### `backdrop`
 
-If true, background content will be overlaid with an opaque screen.
+If true, background content will be overlaid with an opaque screen. If a string, a CSS class name will be placed on the backdrop element for custom styling. Note that the backdrop element is a parent of the element that receives the `className` prop, so if nesting styles, the backdrop class must be the parent.
 
-- type: boolean
-- default: false
-
----
-
-##### `blur`
-
-If true, background content will be blurred.
-
-- type: boolean
+- type: boolean | string
 - default: false
 
 ---
@@ -497,7 +488,6 @@ export function ModalExample() {
         <Modal
           className={styles.modal}
           backdrop
-          blur
           closeOnEscape
           closeOnOutsideClick
           onClose={handleClose}
