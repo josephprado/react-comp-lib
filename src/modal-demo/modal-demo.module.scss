@@ -4,6 +4,12 @@
   gap: 1rem;
 }
 
+.customBackdrop {
+  background-color: rgb(0 0 255 / 0.3);
+  border: 4px dashed blue;
+  backdrop-filter: blur(1px);
+}
+
 .modal {
   max-height: 60%;
   width: 384px;
