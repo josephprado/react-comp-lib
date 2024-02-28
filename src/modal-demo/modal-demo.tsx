@@ -12,7 +12,6 @@ interface DemoModalProps extends ModalProps {
 function DemoModal({
   headerText,
   backdrop,
-  blur,
   closeOnEscape,
   closeOnOutsideClick,
   onClose,
@@ -21,7 +20,6 @@ function DemoModal({
     <Modal
       className={styles.modal}
       backdrop={backdrop}
-      blur={blur}
       closeOnEscape={closeOnEscape}
       closeOnOutsideClick={closeOnOutsideClick}
       onClose={onClose}
@@ -70,12 +68,11 @@ function DemoModal({
 
 export function ModalDemo() {
   const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
-  const [showBlurBackdrop, setShowBlurBackdrop] = useState<boolean>(false);
   const [showNoBackdrop, setShowNoBackdrop] = useState<boolean>(false);
-  const [showBlurNoBackdrop, setShowBlurNoBackdrop] = useState<boolean>(false);
   const [showCloseOnEscape, setShowCloseOnEscape] = useState<boolean>(false);
   const [showCloseOnOutsideClick, setShowCloseOnOutsideClick] =
     useState<boolean>(false);
+  const [showCustomBackdrop, setShowCustomBackdrop] = useState<boolean>(false);
 
   return (
     <DemoSection title="MODAL">
@@ -93,20 +90,6 @@ export function ModalDemo() {
           )}
         </ExampleContainer>
 
-        <ExampleContainer title="Blur with Backdrop">
-          <button type="button" onClick={() => setShowBlurBackdrop(true)}>
-            Click Me!
-          </button>
-          {showBlurBackdrop && (
-            <DemoModal
-              className={styles.modal}
-              onClose={() => setShowBlurBackdrop(false)}
-              backdrop
-              blur
-            />
-          )}
-        </ExampleContainer>
-
         <ExampleContainer title="Without Backdrop">
           <button type="button" onClick={() => setShowNoBackdrop(true)}>
             Click Me!
@@ -115,19 +98,6 @@ export function ModalDemo() {
             <DemoModal
               className={styles.modal}
               onClose={() => setShowNoBackdrop(false)}
-            />
-          )}
-        </ExampleContainer>
-
-        <ExampleContainer title="Blur without Backdrop">
-          <button type="button" onClick={() => setShowBlurNoBackdrop(true)}>
-            Click Me!
-          </button>
-          {showBlurNoBackdrop && (
-            <DemoModal
-              className={styles.modal}
-              onClose={() => setShowBlurNoBackdrop(false)}
-              blur
             />
           )}
         </ExampleContainer>
@@ -161,6 +131,20 @@ export function ModalDemo() {
               onClose={() => setShowCloseOnOutsideClick(false)}
               closeOnOutsideClick
               backdrop
+            />
+          )}
+        </ExampleContainer>
+
+        <ExampleContainer title="Custom Backdrop">
+          <button type="button" onClick={() => setShowCustomBackdrop(true)}>
+            Click Me!
+          </button>
+          {showCustomBackdrop && (
+            <DemoModal
+              headerText="Click Outside to Close"
+              className={styles.modal}
+              onClose={() => setShowCustomBackdrop(false)}
+              backdrop={styles.customBackdrop}
             />
           )}
         </ExampleContainer>

@@ -15,7 +15,6 @@ export function ModalExample() {
         <Modal
           className={styles.modal}
           backdrop
-          blur
           closeOnEscape
           closeOnOutsideClick
           onClose={handleClose}

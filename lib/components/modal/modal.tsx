@@ -15,23 +15,47 @@ export interface ModalProps {
   id?: string;
 
   /**
-   * A CSS class name.
+   * A CSS class name applied to the element that wraps the children of the
+   * modal. To apply styles to the modal backdrop, use the `backdrop` prop.
    */
   className?: string;
 
   /**
-   * If true, background content will be overlaid with an opaque screen.
+   * If true, background content will be overlaid with an opaque screen. If a
+   * string, a CSS class name will be placed on the backdrop element for custom
+   * styling. Note that the backdrop element is a parent of the element that
+   * receives the `className` prop, so if nesting styles, the backdrop class
+   * must be the parent. See example.
    *
    * @default false
-   */
-  backdrop?: boolean;
-
-  /**
-   * If true, background content will be blurred.
+   * @example
+   * ```js
+   * <Modal className="myClassName" backdrop="myBackdrop" onClose={handleClose}>
+   *   <ModalDialogComponent />
+   * </Modal>
+   * ```
+   * ```scss
    *
-   * @default false
+   * // Correct
+   * .myBackdrop {
+   *   background-color: gray;
+   *
+   *   .myClassName {
+   *     height: 256px;
+   *   }
+   * }
+   *
+   * // Incorrect
+   * .myClassName {
+   *   height: 256px;
+   *
+   *   .myBackdrop {
+   *     background-color: gray;
+   *   }
+   * }
+   * ```
    */
-  blur?: boolean;
+  backdrop?: boolean | string;
 
   /**
    * If true, pressing the `Escape` key will close the modal.
@@ -63,7 +87,6 @@ export function Modal({
   id,
   className,
   backdrop = false,
-  blur = false,
   closeOnEscape = false,
   closeOnOutsideClick = false,
   onClose,
@@ -90,8 +113,7 @@ export function Modal({
       id={id}
       className={clsx(
         styles.modal,
-        backdrop && styles.backdrop,
-        blur && styles.blur,
+        backdrop === true ? styles.backdrop : backdrop,
       )}
     >
       {closeOnOutsideClick ? (
