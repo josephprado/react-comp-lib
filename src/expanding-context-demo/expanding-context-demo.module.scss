@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  height: 352px;
+  height: 400px;
 
   .expandingContainer {
     display: flex;
@@ -20,7 +20,7 @@
     }
 
     .sometimesVisible {
-      height: 192px;
+      height: 272px;
       background-color: white;
       border-radius: 0 0 0.5rem 0.5rem;
       padding: 1rem;

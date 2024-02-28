@@ -141,7 +141,6 @@ export function ModalDemo() {
           </button>
           {showCustomBackdrop && (
             <DemoModal
-              headerText="Click Outside to Close"
               className={styles.modal}
               onClose={() => setShowCustomBackdrop(false)}
               backdrop={styles.customBackdrop}
