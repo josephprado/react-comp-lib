@@ -1,7 +1,7 @@
 {
   "name": "@portfolijo/react-comp-lib",
   "private": false,
-  "version": "3.0.0",
+  "version": "3.0.1",
   "type": "module",
   "main": "dist/react-comp-lib.js",
   "types": "dist/main.d.ts",
@@ -54,7 +54,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/josephprado/react-comp-lib.git"
+    "url": "git+https://github.com/portfolijo/react-comp-lib.git"
   },
   "keywords": [
     "react"
@@ -62,7 +62,7 @@
   "author": "Joe Prado",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/josephprado/react-comp-lib/issues"
+    "url": "https://github.com/portfolijo/react-comp-lib/issues"
   },
-  "homepage": "https://github.com/josephprado/react-comp-lib#readme"
+  "homepage": "https://github.com/portfolijo/react-comp-lib#readme"
 }
