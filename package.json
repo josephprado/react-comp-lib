@@ -3,7 +3,7 @@
   "private": false,
   "version": "3.0.1",
   "type": "module",
-  "main": "dist/react-comp-lib.js",
+  "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "files": [
     "dist"
