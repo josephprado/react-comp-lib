@@ -1,7 +1,7 @@
 {
   "name": "@portfolijo/react-comp-lib",
   "private": false,
-  "version": "2.3.5",
+  "version": "3.0.0",
   "type": "module",
   "main": "dist/react-comp-lib.js",
   "types": "dist/main.d.ts",
