@@ -1,7 +1,4 @@
 // COMPONENTS
-export { DataEditingContextProvider } from './components/data-editing-context/data-editing-context-provider';
-export { useDataEditingContext } from './components/data-editing-context/use-data-editing-context';
-export { withDataEditingContext } from './components/data-editing-context/with-data-editing-context';
 export { ExpandingContextProvider } from './components/expanding-context/expanding-context-provider';
 export { useExpandingContext } from './components/expanding-context/use-expanding-context';
 export { withExpandingContext } from './components/expanding-context/with-expanding-context';
