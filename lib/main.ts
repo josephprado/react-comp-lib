@@ -29,6 +29,9 @@ export { WizardContextProvider } from './components/wizard-context/wizard-contex
 export { useWizardContext } from './components/wizard-context/use-wizard-context';
 export { withWizardContext } from './components/wizard-context/with-wizard-context';
 
+// HOOKS
+export { useDataEditing } from './hooks/use-data-editing/use-data-editing';
+
 // UTILITIES
 export { formatDateForInput } from './utilities/format-text/format-date-for-input';
 export { formatMoney } from './utilities/format-text/format-money';
