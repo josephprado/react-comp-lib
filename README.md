@@ -18,9 +18,9 @@ import '@portfolijo/react-comp-lib/dist/style.css';
 
 ## Usage
 
-### DataEditingContext
+### useDataEditing\<T\>
 
-Maintains state and functions used by components with editable data.
+Provides utilities for editing data.
 
 #### Values
 
@@ -37,18 +37,18 @@ True when in the editing state, and false when not.
 
 An object containing updated values of the data.
 
-- type: KeyValue
+- type: Partial\<T\>
 - default: {}
 
 ---
 
-##### `handleChange`
+##### `updateValue<K extends keyof T>`
 
 Sets the named property in `updates`.
 
 - Parameters:
-  - `name`: string
-  - `value`: unknown
+  - `name`: K
+  - `value`: K[T]
 
 ---
 
@@ -57,7 +57,7 @@ Sets the named property in `updates`.
 Sets `editing` to true and initializes `updates` with `initUpdates`.
 
 - Parameters:
-  - `initUpdates`?: KeyValue
+  - `initUpdates`?: Partial\<T\>
 
 ---
 
@@ -72,34 +72,36 @@ Sets `editing` to false and clears `updates`.
 ```ts
 import styles from './styles.module.scss';
 import { useState } from 'react';
-import {
-  useDataEditingContext,
-  withDataEditingContext,
-} from '@portfolijo/react-comp-lib';
+import { useDataEditing } from '@portfolijo/react-comp-lib';
 
-const DEPARTMENT_OPTIONS = [
-  'Accounting',
-  'Admin',
-  'Business',
-  'HR',
-  'IT',
-  'Sales',
+type User = {
+  name: string;
+  age: number;
+  hobbies: string[];
+};
+
+const HOBBY_OPTIONS = [
+  'Board Games',
+  'Hiking',
+  'Photography',
+  'Reading',
+  'Running',
+  'Swimming',
+  'Other',
 ];
 
-function WrappedComponent() {
-  const { editing, updates, handleChange, openEditMode, cancelEditMode } =
-    useDataEditingContext();
+export function DataEditingComponent() {
+  const { editing, updates, updateValue, openEditMode, cancelEditMode } =
+    useDataEditing<User>();
 
   const [name, setName] = useState<string>('Joe Schmo');
-  const [department, setDepartment] = useState<string>(DEPARTMENT_OPTIONS[0]);
-
-  const handleInputChange = (event: any) => {
-    handleChange(event.target.name, event.target.value);
-  };
+  const [age, setAge] = useState<number>(30);
+  const [hobbies, setHobbies] = useState<string[]>([HOBBY_OPTIONS[0]]);
 
   const handleSave = () => {
-    setName(updates.name as string);
-    setDepartment(updates.department as string);
+    setName(updates.name ?? '');
+    setAge(updates.age ?? 0);
+    setHobbies(updates.hobbies ?? []);
     cancelEditMode();
   };
 
@@ -110,33 +112,52 @@ function WrappedComponent() {
         {editing ? (
           <input
             id="name-input"
-            name="name"
             type="text"
-            value={updates.name as string}
-            onChange={handleInputChange}
+            value={updates.name ?? ''}
+            onChange={(event) => updateValue('name', event.target.value)}
           />
         ) : (
           name
         )}
       </label>
 
-      <label htmlFor="department-input">
-        <span>Department:</span>
+      <label htmlFor="age-input">
+        <span>Age:</span>
+        {editing ? (
+          <input
+            id="age-input"
+            type="number"
+            min={0}
+            value={updates.age ?? ''}
+            onChange={(event) => updateValue('age', +event.target.value)}
+          />
+        ) : (
+          age
+        )}
+      </label>
+
+      <label htmlFor="hobbies-input">
+        <span>Hobbies:</span>
         {editing ? (
           <select
-            id="department-input"
-            name="department"
-            value={updates.department as string}
-            onChange={handleInputChange}
+            id="hobbies-input"
+            multiple
+            value={updates.hobbies ?? []}
+            onChange={(event) =>
+              updateValue(
+                'hobbies',
+                [...event.target.selectedOptions].map(({ value }) => value),
+              )
+            }
           >
-            {DEPARTMENT_OPTIONS.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
+            {HOBBY_OPTIONS.map((hobby) => (
+              <option key={hobby} value={hobby}>
+                {hobby}
               </option>
             ))}
           </select>
         ) : (
-          department
+          hobbies.join(', ')
         )}
       </label>
 
@@ -149,7 +170,9 @@ function WrappedComponent() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={!(updates.name as string).length}
+              disabled={
+                !updates.name?.trim().length || !updates.hobbies?.length
+              }
             >
               Save
             </button>
@@ -158,7 +181,7 @@ function WrappedComponent() {
           <button
             className={styles.editButton}
             type="button"
-            onClick={() => openEditMode({ name, department })}
+            onClick={() => openEditMode({ name, age, hobbies })}
           >
             Edit
           </button>
@@ -167,8 +190,6 @@ function WrappedComponent() {
     </div>
   );
 }
-
-export const DataEditingComponent = withDataEditingContext(WrappedComponent);
 ```
 
 ### ExpandingContext
