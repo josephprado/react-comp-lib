@@ -25,12 +25,10 @@ export { TableBody } from './components/table/table-body';
 export { TableFooter } from './components/table/table-footer';
 export { TableRow } from './components/table/table-row';
 export { useSorting } from './components/table/use-sorting';
-export { WizardContextProvider } from './components/wizard-context/wizard-context-provider';
-export { useWizardContext } from './components/wizard-context/use-wizard-context';
-export { withWizardContext } from './components/wizard-context/with-wizard-context';
 
 // HOOKS
 export { useDataEditing } from './hooks/use-data-editing/use-data-editing';
+export { useWizard } from './hooks/use-wizard/use-wizard';
 
 // UTILITIES
 export { formatDateForInput } from './utilities/format-text/format-date-for-input';

@@ -258,9 +258,9 @@ function WrappedComponent() {
 export const ExpandingComponent = withExpandingContext(WrappedComponent, true);
 ```
 
-### WizardContext
+### useWizard\<T\>
 
-Maintains state and functions used by step-by-step "wizard" components.
+Provides utilities for step-by-step "wizard" components.
 
 #### Values
 
@@ -268,18 +268,18 @@ Maintains state and functions used by step-by-step "wizard" components.
 
 An object storing data used by the wizard component.
 
-- type: KeyValue
+- type: Partial\<T\>
 - default: {}
 
 ---
 
-##### `handleChange`
+##### `setValue<K extends keyof T>`
 
-Updates the named property in `values`.
+Sets the named property in `values`.
 
 - Parameters:
-  - `name`: string
-  - `value`: unknown
+  - `name`: K
+  - `value`: K[T]
 
 ---
 
@@ -314,124 +314,166 @@ Restores the initial state of `values` and `stepIndex`.
 
 ```ts
 import styles from './styles.module.scss';
-import { useWizardContext, withWizardContext } from '@portfolijo/react-comp-lib';
+import { WizardUtils } from '@portfolijo/react-comp-lib/dist/hooks/use-wizard/use-wizard';
+import { useWizard } from '@portfolijo/react-comp-lib';
 
-interface StepProps {
-  inputs: {
-    name: string;
-    options?: string[];
-  }[];
-  submit?: boolean;
+interface StepControlsProps {
+  isComplete: boolean;
+  handleSubmit?: () => void;
+  wizardUtils: Pick<WizardUtils, 'stepIndex' | 'prevStep' | 'nextStep'>;
 }
 
-function Step({ inputs, submit }: StepProps) {
-  const { values, handleChange, stepIndex, prevStep, nextStep, reset } =
-    useWizardContext();
+function StepControls({
+  isComplete,
+  handleSubmit,
+  wizardUtils,
+}: StepControlsProps) {
+  const { stepIndex, prevStep, nextStep } = wizardUtils;
+  return (
+    <div className={styles.buttonContainer}>
+      {stepIndex > 0 && (
+        <button type="button" onClick={prevStep}>
+          Back
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={handleSubmit ?? nextStep}
+        disabled={!isComplete}
+      >
+        {handleSubmit ? 'Submit' : 'Next'}
+      </button>
+    </div>
+  );
+}
 
-  const isIncomplete = inputs.some(({ name }) => !values[name]);
+interface StepProps<T extends object> {
+  wizardUtils: Pick<
+    WizardUtils<T>,
+    'values' | 'setValue' | 'stepIndex' | 'prevStep' | 'nextStep'
+  >;
+}
 
-  const handleValueChange = (event: any) => {
-    handleChange(event.target.name, event.target.value);
-  };
+type Employee = {
+  name: string;
+  department: string;
+  phone: string;
+  phoneType: string;
+};
 
-  const handleSubmit = () => {
-    window.alert(
-      Object.entries(values)
-        .map(([name, value]) => `${name}: ${value}`)
-        .join('\n'),
-    );
-    reset();
-  };
+function Step1({
+  wizardUtils,
+}: StepProps<Pick<Employee, 'name' | 'department'>>) {
+  const { values, setValue, ...rest } = wizardUtils;
+  const isComplete = !!values.name?.trim() && !!values.department;
 
   return (
     <div className={styles.step}>
-      {inputs.map(({ name, options }) => (
-        <label key={name} htmlFor={name}>
-          <span>{name}:</span>
-          {options ? (
-            <select
-              id={name}
-              name={name}
-              value={(values[name] as string) ?? ''}
-              onChange={handleValueChange}
-            >
-              <option value="" disabled style={{ display: 'none' }}>
-                Select {name}
-              </option>
-              {options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              id={name}
-              name={name}
-              type="text"
-              value={(values[name] as string) ?? ''}
-              onChange={handleValueChange}
-            />
-          )}
-        </label>
-      ))}
-      <div className={styles.buttonContainer}>
-        {stepIndex > 0 && (
-          <button type="button" onClick={prevStep}>
-            Back
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={submit ? handleSubmit : nextStep}
-          disabled={isIncomplete}
+      <label htmlFor="name">
+        <span>Name:</span>
+        <input
+          id="name"
+          type="text"
+          value={values.name ?? ''}
+          onChange={(event) => setValue('name', event.target.value)}
+        />
+      </label>
+      <label htmlFor="department">
+        <span>Department:</span>
+        <select
+          id="department"
+          value={values.department ?? ''}
+          onChange={(event) => setValue('department', event.target.value)}
         >
-          {submit ? 'Submit' : 'Next'}
-        </button>
-      </div>
+          <option value="" disabled style={{ display: 'none' }}>
+            Select Department
+          </option>
+          {['Accounting', 'Admin', 'Business', 'HR', 'IT', 'Sales'].map(
+            (opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ),
+          )}
+        </select>
+      </label>
+      <StepControls isComplete={isComplete} wizardUtils={rest} />
     </div>
   );
 }
 
-const STEPS: StepProps[] = [
-  {
-    inputs: [
-      { name: 'Name' },
-      {
-        name: 'Department',
-        options: ['Accounting', 'Admin', 'Business', 'HR', 'IT', 'Sales'],
-      },
-    ],
-  },
-  {
-    inputs: [
-      { name: 'Phone' },
-      {
-        name: 'Type',
-        options: ['Home', 'Office', 'Mobile'],
-      },
-    ],
-  },
-];
+function Step2({
+  wizardUtils,
+  handleSubmit,
+}: StepProps<Pick<Employee, 'phone' | 'phoneType'>> & {
+  handleSubmit: () => void;
+}) {
+  const { values, setValue, ...rest } = wizardUtils;
+  const isComplete = !!values.phone?.trim() && !!values.phoneType;
 
-function WrappedComponent() {
-  const { stepIndex } = useWizardContext();
+  return (
+    <div className={styles.step}>
+      <label htmlFor="phone">
+        <span>Phone:</span>
+        <input
+          id="phone"
+          type="tel"
+          value={values.phone ?? ''}
+          onChange={(event) => setValue('phone', event.target.value)}
+        />
+      </label>
+      <label htmlFor="phoneType">
+        <span>Type:</span>
+        <select
+          id="phoneType"
+          value={values.phoneType ?? ''}
+          onChange={(event) => setValue('phoneType', event.target.value)}
+        >
+          <option value="" disabled style={{ display: 'none' }}>
+            Select Type
+          </option>
+          {['Home', 'Office', 'Mobile'].map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+      </label>
+      <StepControls
+        isComplete={isComplete}
+        handleSubmit={handleSubmit}
+        wizardUtils={rest}
+      />
+    </div>
+  );
+}
 
-  const steps = STEPS.map((props, i) => (
-    <Step {...props} submit={i === STEPS.length - 1} />
-  ));
+export function WizardComponent() {
+  const wizardUtils = useWizard<Employee>();
+
+  const handleSubmit = () => {
+    window.alert(
+      Object.entries(wizardUtils.values)
+        .map(([name, value]) => `${name}: ${value}`)
+        .join('\n'),
+    );
+    wizardUtils.reset();
+  };
+
+  const steps = [
+    <Step1 wizardUtils={wizardUtils} />,
+    <Step2 wizardUtils={wizardUtils} handleSubmit={handleSubmit} />,
+  ];
 
   return (
     <div className={styles.container}>
-      {steps[stepIndex]}
+      {steps[wizardUtils.stepIndex]}
       <div className={styles.stepCount}>
-        Step {stepIndex + 1} of {STEPS.length}
+        Step {wizardUtils.stepIndex + 1} of {steps.length}
       </div>
     </div>
   );
 }
-
-export const WizardComponent = withWizardContext(WrappedComponent);
 ```
 
 ### Modal
