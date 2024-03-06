@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { DemoSection } from '../components/demo-section';
 import { ExampleContainer } from '../components/example-container';
 import styles from './modal-demo.module.scss';
-import { XIcon } from '../../lib/components/icons/x-icon';
 import { Modal, ModalProps } from '../../lib/components/modal/modal';
 
 interface DemoModalProps extends ModalProps {
@@ -26,9 +25,8 @@ function DemoModal({
     >
       <div className={styles.modalDialogHeader}>
         {headerText}
-
         <button type="button" onClick={() => onClose()}>
-          <XIcon height={24} width={24} />
+          X
         </button>
       </div>
       <div className={styles.modalDialogBody}>
