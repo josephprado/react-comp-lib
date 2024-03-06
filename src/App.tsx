@@ -2,7 +2,6 @@ import './App.css';
 import { SkipNavDemo } from './skip-nav-demo/skip-nav-demo';
 import { OutsideClickHandlerDemo } from './outside-click-handler-demo/outside-click-handler-demo';
 import { TableDemo } from './table-demo/table-demo';
-import { ExpandingContextDemo } from './expanding-context-demo/expanding-context-demo';
 import { FormatTelUSADemo } from './format-tel-usa-demo/format-tel-usa-demo';
 import { ModalDemo } from './modal-demo/modal-demo';
 
@@ -13,7 +12,6 @@ function App() {
       <SkipNavDemo containerId="demos" />
       <OutsideClickHandlerDemo />
       <TableDemo />
-      <ExpandingContextDemo />
       <FormatTelUSADemo />
       <ModalDemo />
     </div>
