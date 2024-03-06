@@ -18,9 +18,9 @@ import '@portfolijo/react-comp-lib/dist/style.css';
 
 ## Usage
 
-### DataEditingContext
+### useDataEditing\<T\>
 
-Maintains state and functions used by components with editable data.
+Provides utilities for editing data.
 
 #### Values
 
@@ -37,18 +37,18 @@ True when in the editing state, and false when not.
 
 An object containing updated values of the data.
 
-- type: KeyValue
+- type: Partial\<T\>
 - default: {}
 
 ---
 
-##### `handleChange`
+##### `updateValue<K extends keyof T>`
 
 Sets the named property in `updates`.
 
 - Parameters:
-  - `name`: string
-  - `value`: unknown
+  - `name`: K
+  - `value`: K[T]
 
 ---
 
@@ -57,7 +57,7 @@ Sets the named property in `updates`.
 Sets `editing` to true and initializes `updates` with `initUpdates`.
 
 - Parameters:
-  - `initUpdates`?: KeyValue
+  - `initUpdates`?: Partial\<T\>
 
 ---
 
@@ -72,34 +72,36 @@ Sets `editing` to false and clears `updates`.
 ```ts
 import styles from './styles.module.scss';
 import { useState } from 'react';
-import {
-  useDataEditingContext,
-  withDataEditingContext,
-} from '@portfolijo/react-comp-lib';
+import { useDataEditing } from '@portfolijo/react-comp-lib';
 
-const DEPARTMENT_OPTIONS = [
-  'Accounting',
-  'Admin',
-  'Business',
-  'HR',
-  'IT',
-  'Sales',
+type User = {
+  name: string;
+  age: number;
+  hobbies: string[];
+};
+
+const HOBBY_OPTIONS = [
+  'Board Games',
+  'Hiking',
+  'Photography',
+  'Reading',
+  'Running',
+  'Swimming',
+  'Other',
 ];
 
-function WrappedComponent() {
-  const { editing, updates, handleChange, openEditMode, cancelEditMode } =
-    useDataEditingContext();
+export function DataEditingComponent() {
+  const { editing, updates, updateValue, openEditMode, cancelEditMode } =
+    useDataEditing<User>();
 
   const [name, setName] = useState<string>('Joe Schmo');
-  const [department, setDepartment] = useState<string>(DEPARTMENT_OPTIONS[0]);
-
-  const handleInputChange = (event: any) => {
-    handleChange(event.target.name, event.target.value);
-  };
+  const [age, setAge] = useState<number>(30);
+  const [hobbies, setHobbies] = useState<string[]>([HOBBY_OPTIONS[0]]);
 
   const handleSave = () => {
-    setName(updates.name as string);
-    setDepartment(updates.department as string);
+    setName(updates.name ?? '');
+    setAge(updates.age ?? 0);
+    setHobbies(updates.hobbies ?? []);
     cancelEditMode();
   };
 
@@ -110,33 +112,52 @@ function WrappedComponent() {
         {editing ? (
           <input
             id="name-input"
-            name="name"
             type="text"
-            value={updates.name as string}
-            onChange={handleInputChange}
+            value={updates.name ?? ''}
+            onChange={(event) => updateValue('name', event.target.value)}
           />
         ) : (
           name
         )}
       </label>
 
-      <label htmlFor="department-input">
-        <span>Department:</span>
+      <label htmlFor="age-input">
+        <span>Age:</span>
+        {editing ? (
+          <input
+            id="age-input"
+            type="number"
+            min={0}
+            value={updates.age ?? ''}
+            onChange={(event) => updateValue('age', +event.target.value)}
+          />
+        ) : (
+          age
+        )}
+      </label>
+
+      <label htmlFor="hobbies-input">
+        <span>Hobbies:</span>
         {editing ? (
           <select
-            id="department-input"
-            name="department"
-            value={updates.department as string}
-            onChange={handleInputChange}
+            id="hobbies-input"
+            multiple
+            value={updates.hobbies ?? []}
+            onChange={(event) =>
+              updateValue(
+                'hobbies',
+                [...event.target.selectedOptions].map(({ value }) => value),
+              )
+            }
           >
-            {DEPARTMENT_OPTIONS.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
+            {HOBBY_OPTIONS.map((hobby) => (
+              <option key={hobby} value={hobby}>
+                {hobby}
               </option>
             ))}
           </select>
         ) : (
-          department
+          hobbies.join(', ')
         )}
       </label>
 
@@ -149,7 +170,9 @@ function WrappedComponent() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={!(updates.name as string).length}
+              disabled={
+                !updates.name?.trim().length || !updates.hobbies?.length
+              }
             >
               Save
             </button>
@@ -158,7 +181,7 @@ function WrappedComponent() {
           <button
             className={styles.editButton}
             type="button"
-            onClick={() => openEditMode({ name, department })}
+            onClick={() => openEditMode({ name, age, hobbies })}
           >
             Edit
           </button>
@@ -167,79 +190,11 @@ function WrappedComponent() {
     </div>
   );
 }
-
-export const DataEditingComponent = withDataEditingContext(WrappedComponent);
 ```
 
-### ExpandingContext
+### useWizard\<T\>
 
-Maintains state and functions used by components that expand and contract.
-
-#### Props
-
-##### `isExpanded`
-
-Sets the initial value of `expanded`.
-
-- type: boolean
-- default: false
-
----
-
-#### Values
-
-##### `expanded`
-
-True when in the expanded state, and false when contracted.
-
-- type: boolean
-- default: false
-
----
-
-##### `setExpanded`
-
-- A set state function for `expanded`.
-
----
-
-#### Example
-
-```ts
-import styles from './styles.module.scss';
-import { useExpandingContext, withExpandingContext } from '@portfolijo/react-comp-lib';
-
-function WrappedComponent() {
-  const { expanded, setExpanded } = useExpandingContext();
-  return (
-    <div
-      className={styles.container}
-      onClick={() => setExpanded((prev) => !prev)}
-    >
-      <div className={styles.alwaysVisible}>
-        Click here to {expanded ? 'collapse' : 'expanded'}!
-      </div>
-      {expanded && (
-        <div
-          className={styles.sometimesVisible}
-          onClick={(event) => event.stopPropagation()}
-        >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat.
-        </div>
-      )}
-    </div>
-  );
-}
-
-export const ExpandingComponent = withExpandingContext(WrappedComponent, true);
-```
-
-### WizardContext
-
-Maintains state and functions used by step-by-step "wizard" components.
+Provides utilities for step-by-step "wizard" components.
 
 #### Values
 
@@ -247,18 +202,18 @@ Maintains state and functions used by step-by-step "wizard" components.
 
 An object storing data used by the wizard component.
 
-- type: KeyValue
+- type: Partial\<T\>
 - default: {}
 
 ---
 
-##### `handleChange`
+##### `setValue<K extends keyof T>`
 
-Updates the named property in `values`.
+Sets the named property in `values`.
 
 - Parameters:
-  - `name`: string
-  - `value`: unknown
+  - `name`: K
+  - `value`: K[T]
 
 ---
 
@@ -293,124 +248,179 @@ Restores the initial state of `values` and `stepIndex`.
 
 ```ts
 import styles from './styles.module.scss';
-import { useWizardContext, withWizardContext } from '@portfolijo/react-comp-lib';
+import { WizardUtils } from '@portfolijo/react-comp-lib/dist/hooks/use-wizard/use-wizard';
+import { useWizard } from '@portfolijo/react-comp-lib';
 
-interface StepProps {
-  inputs: {
-    name: string;
-    options?: string[];
-  }[];
-  submit?: boolean;
+interface StepControlsProps
+  extends Pick<WizardUtils, 'stepIndex' | 'prevStep' | 'nextStep'> {
+  isComplete: boolean;
+  handleSubmit?: () => void;
 }
 
-function Step({ inputs, submit }: StepProps) {
-  const { values, handleChange, stepIndex, prevStep, nextStep, reset } =
-    useWizardContext();
+function StepControls({
+  isComplete,
+  handleSubmit,
+  stepIndex,
+  prevStep,
+  nextStep,
+}: StepControlsProps) {
+  return (
+    <div className={styles.buttonContainer}>
+      {stepIndex > 0 && (
+        <button type="button" onClick={prevStep}>
+          Back
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={handleSubmit ?? nextStep}
+        disabled={!isComplete}
+      >
+        {handleSubmit ? 'Submit' : 'Next'}
+      </button>
+    </div>
+  );
+}
 
-  const isIncomplete = inputs.some(({ name }) => !values[name]);
+interface StepProps<T extends object>
+  extends Pick<
+    WizardUtils<T>,
+    'values' | 'setValue' | 'stepIndex' | 'prevStep' | 'nextStep'
+  > {}
 
-  const handleValueChange = (event: any) => {
-    handleChange(event.target.name, event.target.value);
-  };
+interface Employee {
+  name: string;
+  department: string;
+  phone: string;
+  phoneType: string;
+}
+
+function Step1({
+  values,
+  setValue,
+  stepIndex,
+  prevStep,
+  nextStep,
+}: StepProps<Pick<Employee, 'name' | 'department'>>) {
+  const isComplete = !!values.name?.trim() && !!values.department;
+
+  return (
+    <div className={styles.step}>
+      <label htmlFor="name">
+        <span>Name:</span>
+        <input
+          id="name"
+          type="text"
+          value={values.name ?? ''}
+          onChange={(event) => setValue('name', event.target.value)}
+        />
+      </label>
+      <label htmlFor="department">
+        <span>Department:</span>
+        <select
+          id="department"
+          value={values.department ?? ''}
+          onChange={(event) => setValue('department', event.target.value)}
+        >
+          <option value="" disabled style={{ display: 'none' }}>
+            Select Department
+          </option>
+          {['Accounting', 'Admin', 'Business', 'HR', 'IT', 'Sales'].map(
+            (opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ),
+          )}
+        </select>
+      </label>
+      <StepControls
+        isComplete={isComplete}
+        stepIndex={stepIndex}
+        prevStep={prevStep}
+        nextStep={nextStep}
+      />
+    </div>
+  );
+}
+
+function Step2({
+  values,
+  setValue,
+  stepIndex,
+  prevStep,
+  nextStep,
+  handleSubmit,
+}: StepProps<Pick<Employee, 'phone' | 'phoneType'>> & {
+  handleSubmit: () => void;
+}) {
+  const isComplete = !!values.phone?.trim() && !!values.phoneType;
+
+  return (
+    <div className={styles.step}>
+      <label htmlFor="phone">
+        <span>Phone:</span>
+        <input
+          id="phone"
+          type="tel"
+          value={values.phone ?? ''}
+          onChange={(event) => setValue('phone', event.target.value)}
+        />
+      </label>
+      <label htmlFor="phoneType">
+        <span>Type:</span>
+        <select
+          id="phoneType"
+          value={values.phoneType ?? ''}
+          onChange={(event) => setValue('phoneType', event.target.value)}
+        >
+          <option value="" disabled style={{ display: 'none' }}>
+            Select Type
+          </option>
+          {['Home', 'Office', 'Mobile'].map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+      </label>
+      <StepControls
+        isComplete={isComplete}
+        handleSubmit={handleSubmit}
+        stepIndex={stepIndex}
+        prevStep={prevStep}
+        nextStep={nextStep}
+      />
+    </div>
+  );
+}
+
+export function WizardComponent() {
+  const { reset, ...wizardUtils } = useWizard<Employee>();
 
   const handleSubmit = () => {
     window.alert(
-      Object.entries(values)
+      Object.entries(wizardUtils.values)
         .map(([name, value]) => `${name}: ${value}`)
         .join('\n'),
     );
     reset();
   };
 
-  return (
-    <div className={styles.step}>
-      {inputs.map(({ name, options }) => (
-        <label key={name} htmlFor={name}>
-          <span>{name}:</span>
-          {options ? (
-            <select
-              id={name}
-              name={name}
-              value={(values[name] as string) ?? ''}
-              onChange={handleValueChange}
-            >
-              <option value="" disabled style={{ display: 'none' }}>
-                Select {name}
-              </option>
-              {options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              id={name}
-              name={name}
-              type="text"
-              value={(values[name] as string) ?? ''}
-              onChange={handleValueChange}
-            />
-          )}
-        </label>
-      ))}
-      <div className={styles.buttonContainer}>
-        {stepIndex > 0 && (
-          <button type="button" onClick={prevStep}>
-            Back
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={submit ? handleSubmit : nextStep}
-          disabled={isIncomplete}
-        >
-          {submit ? 'Submit' : 'Next'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-const STEPS: StepProps[] = [
-  {
-    inputs: [
-      { name: 'Name' },
-      {
-        name: 'Department',
-        options: ['Accounting', 'Admin', 'Business', 'HR', 'IT', 'Sales'],
-      },
-    ],
-  },
-  {
-    inputs: [
-      { name: 'Phone' },
-      {
-        name: 'Type',
-        options: ['Home', 'Office', 'Mobile'],
-      },
-    ],
-  },
-];
-
-function WrappedComponent() {
-  const { stepIndex } = useWizardContext();
-
-  const steps = STEPS.map((props, i) => (
-    <Step {...props} submit={i === STEPS.length - 1} />
-  ));
+  const steps = [
+    <Step1 {...wizardUtils} />,
+    <Step2 {...wizardUtils} handleSubmit={handleSubmit} />,
+  ];
 
   return (
     <div className={styles.container}>
-      {steps[stepIndex]}
+      {steps[wizardUtils.stepIndex]}
       <div className={styles.stepCount}>
-        Step {stepIndex + 1} of {STEPS.length}
+        Step {wizardUtils.stepIndex + 1} of {steps.length}
       </div>
     </div>
   );
 }
-
-export const WizardComponent = withWizardContext(WrappedComponent);
 ```
 
 ### Modal
@@ -719,8 +729,14 @@ interface Employee {
 const data: Employee[] = [
   { name: 'Joe', age: 30, department: 'Accounting' },
   { name: 'Bob', age: 25, department: 'Admin' },
-  { name: 'Kate', age: 28, department: 'Business' },
-  { name: 'Eve', age: 34, department: 'IT' },
+  { name: 'Kate', age: 28, department: 'Facilities' },
+  { name: 'Mike', age: 34, department: 'IT' },
+  { name: 'Jill', age: 31, department: 'Business' },
+  { name: 'Art', age: 22, department: 'Sales' },
+  { name: 'Jane', age: 25, department: 'Sales' },
+  { name: 'Sam', age: 41, department: 'Marketing' },
+  { name: 'Eve', age: 29, department: 'Business Development' },
+  { name: 'Gail', age: 34, department: 'Admin' },
 ];
 
 const headers: HeaderCell<Employee>[] = [
@@ -730,7 +746,11 @@ const headers: HeaderCell<Employee>[] = [
 ];
 
 export function TableExample() {
-  const [sortKey, sortDir, sortFn, sortedData] = useSorting(data, 'name', 'up');
+  const [sortKey, sortDir, sortFn, sortedData] = useSorting<Employee>(
+    data,
+    'name',
+    'up',
+  );
   return (
     <Table numCols={headers.length} className={styles.table}>
       <TableHeader<Employee>
@@ -749,6 +769,10 @@ export function TableExample() {
           />
         ))}
       </TableBody>
+      <TableFooter
+        className={styles.tableFooter}
+        cells={[`# Employees: ${data.length}`]}
+      />
     </Table>
   );
 }

@@ -1,0 +1,21 @@
+.table {
+  grid-template-rows: auto fit-content(128px) auto;
+  border: 1px solid lightgray;
+
+  th:hover {
+    cursor: pointer;
+  }
+
+  .tableHeader {
+    background-color: lightgray;
+  }
+
+  .tableRow:nth-of-type(even) {
+    background-color: whitesmoke;
+  }
+
+  .tableFooter tr td {
+    border-top: 1px solid gray;
+    grid-column: 1 / span 3;
+  }
+}

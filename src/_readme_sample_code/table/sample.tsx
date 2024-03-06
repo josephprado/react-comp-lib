@@ -2,6 +2,7 @@ import styles from './styles.module.scss';
 import {
   Table,
   TableBody,
+  TableFooter,
   TableHeader,
   TableRow,
   useSorting,
@@ -17,8 +18,14 @@ interface Employee {
 const data: Employee[] = [
   { name: 'Joe', age: 30, department: 'Accounting' },
   { name: 'Bob', age: 25, department: 'Admin' },
-  { name: 'Kate', age: 28, department: 'Business' },
-  { name: 'Eve', age: 34, department: 'IT' },
+  { name: 'Kate', age: 28, department: 'Facilities' },
+  { name: 'Mike', age: 34, department: 'IT' },
+  { name: 'Jill', age: 31, department: 'Business' },
+  { name: 'Art', age: 22, department: 'Sales' },
+  { name: 'Jane', age: 25, department: 'Sales' },
+  { name: 'Sam', age: 41, department: 'Marketing' },
+  { name: 'Eve', age: 29, department: 'Business Development' },
+  { name: 'Gail', age: 34, department: 'Admin' },
 ];
 
 const headers: HeaderCell<Employee>[] = [
@@ -28,7 +35,11 @@ const headers: HeaderCell<Employee>[] = [
 ];
 
 export function TableExample() {
-  const [sortKey, sortDir, sortFn, sortedData] = useSorting(data, 'name', 'up');
+  const [sortKey, sortDir, sortFn, sortedData] = useSorting<Employee>(
+    data,
+    'name',
+    'up',
+  );
   return (
     <Table numCols={headers.length} className={styles.table}>
       <TableHeader<Employee>
@@ -37,6 +48,7 @@ export function TableExample() {
         sortKey={sortKey}
         sortDir={sortDir}
         sortFn={sortFn}
+        collapseCarets
       />
       <TableBody>
         {sortedData.map(({ name, age, department }) => (
@@ -47,6 +59,10 @@ export function TableExample() {
           />
         ))}
       </TableBody>
+      <TableFooter
+        className={styles.tableFooter}
+        cells={[`# Employees: ${data.length}`]}
+      />
     </Table>
   );
 }
