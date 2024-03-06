@@ -553,7 +553,7 @@ A CSS class name.
 
 ##### `numCols`
 
-Specifies the number of columns in that table.
+Specifies the number of columns in the table.
 
 - type: number
 
@@ -714,6 +714,7 @@ import styles from './styles.module.scss';
 import {
   Table,
   TableBody,
+  TableFooter,
   TableHeader,
   TableRow,
   useSorting,
