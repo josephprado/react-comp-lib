@@ -2,18 +2,19 @@ import styles from './styles.module.scss';
 import { WizardUtils } from '../../../lib/hooks/use-wizard/use-wizard';
 import { useWizard } from '../../../lib/main';
 
-interface StepControlsProps {
+interface StepControlsProps
+  extends Pick<WizardUtils, 'stepIndex' | 'prevStep' | 'nextStep'> {
   isComplete: boolean;
   handleSubmit?: () => void;
-  wizardUtils: Pick<WizardUtils, 'stepIndex' | 'prevStep' | 'nextStep'>;
 }
 
 function StepControls({
   isComplete,
   handleSubmit,
-  wizardUtils,
+  stepIndex,
+  prevStep,
+  nextStep,
 }: StepControlsProps) {
-  const { stepIndex, prevStep, nextStep } = wizardUtils;
   return (
     <div className={styles.buttonContainer}>
       {stepIndex > 0 && (
@@ -32,24 +33,26 @@ function StepControls({
   );
 }
 
-interface StepProps<T extends object> {
-  wizardUtils: Pick<
+interface StepProps<T extends object>
+  extends Pick<
     WizardUtils<T>,
     'values' | 'setValue' | 'stepIndex' | 'prevStep' | 'nextStep'
-  >;
-}
+  > {}
 
-type Employee = {
+interface Employee {
   name: string;
   department: string;
   phone: string;
   phoneType: string;
-};
+}
 
 function Step1({
-  wizardUtils,
+  values,
+  setValue,
+  stepIndex,
+  prevStep,
+  nextStep,
 }: StepProps<Pick<Employee, 'name' | 'department'>>) {
-  const { values, setValue, ...rest } = wizardUtils;
   const isComplete = !!values.name?.trim() && !!values.department;
 
   return (
@@ -82,18 +85,26 @@ function Step1({
           )}
         </select>
       </label>
-      <StepControls isComplete={isComplete} wizardUtils={rest} />
+      <StepControls
+        isComplete={isComplete}
+        stepIndex={stepIndex}
+        prevStep={prevStep}
+        nextStep={nextStep}
+      />
     </div>
   );
 }
 
 function Step2({
-  wizardUtils,
+  values,
+  setValue,
+  stepIndex,
+  prevStep,
+  nextStep,
   handleSubmit,
 }: StepProps<Pick<Employee, 'phone' | 'phoneType'>> & {
   handleSubmit: () => void;
 }) {
-  const { values, setValue, ...rest } = wizardUtils;
   const isComplete = !!values.phone?.trim() && !!values.phoneType;
 
   return (
@@ -127,14 +138,16 @@ function Step2({
       <StepControls
         isComplete={isComplete}
         handleSubmit={handleSubmit}
-        wizardUtils={rest}
+        stepIndex={stepIndex}
+        prevStep={prevStep}
+        nextStep={nextStep}
       />
     </div>
   );
 }
 
 export function WizardComponent() {
-  const wizardUtils = useWizard<Employee>();
+  const { reset, ...wizardUtils } = useWizard<Employee>();
 
   const handleSubmit = () => {
     window.alert(
@@ -142,12 +155,12 @@ export function WizardComponent() {
         .map(([name, value]) => `${name}: ${value}`)
         .join('\n'),
     );
-    wizardUtils.reset();
+    reset();
   };
 
   const steps = [
-    <Step1 wizardUtils={wizardUtils} />,
-    <Step2 wizardUtils={wizardUtils} handleSubmit={handleSubmit} />,
+    <Step1 {...wizardUtils} />,
+    <Step2 {...wizardUtils} handleSubmit={handleSubmit} />,
   ];
 
   return (
