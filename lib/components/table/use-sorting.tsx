@@ -110,14 +110,14 @@ export function useSorting<T>(
     key?: SortKey<T>;
     dir?: SortDir;
     sorted: Sortable<T>[];
-  }>({
+  }>(() => ({
     key: defaultSortKey,
     dir: defaultSortDir,
     sorted:
       defaultSortKey && defaultSortDir
         ? structuredClone(data).sort(compareFn(defaultSortKey, defaultSortDir))
         : structuredClone(data),
-  });
+  }));
 
   const sortFn: SortFn<T> = (sortKey?: SortKey<T>) => {
     setSort(() => {
