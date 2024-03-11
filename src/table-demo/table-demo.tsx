@@ -87,11 +87,12 @@ const headers: HeaderCell<Employee>[] = [
 ];
 
 export function TableDemo() {
-  const [sortableKey, sortableDir, sortableFn, sortableData] = useSorting(
-    data,
-    'name',
-    'up',
-  );
+  const [sortableKey, sortableDir, sortableFn, sortableData] =
+    useSorting<Employee>({
+      data,
+      defaultSortKey: 'name',
+      defaultSortDir: 'up',
+    });
 
   return (
     <DemoSection title="TABLE">
