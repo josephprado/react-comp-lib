@@ -1,31 +1,34 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SortDir, SortKey, useSorting } from './use-sorting';
+import {
+  CompareFn,
+  SortDir,
+  SortKey,
+  UseSortingProps,
+  useSorting,
+} from './use-sorting';
 
 interface T {
   id: number;
   a: string;
   b: string;
   c: number;
-}
-
-interface TestComponentProps {
-  rows: T[];
-  defaultSortKey?: SortKey<T>;
-  defaultSortDir?: SortDir;
+  d: { x: number; y: number };
 }
 
 function TestComponent({
-  rows,
+  data,
   defaultSortKey,
   defaultSortDir,
-}: TestComponentProps) {
-  const [sortKey, sortDir, sortFn, sortedRows] = useSorting(
-    rows,
+  compareFns,
+}: UseSortingProps<T>) {
+  const [sortKey, sortDir, sortFn, sortedRows] = useSorting<T>({
+    data,
     defaultSortKey,
     defaultSortDir,
-  );
+    compareFns,
+  });
 
   return (
     <>
@@ -34,7 +37,7 @@ function TestComponent({
       <table>
         <thead>
           <tr>
-            {['a', 'b', 'c'].map((key) => (
+            {['a', 'b', 'c', 'd'].map((key) => (
               <th key={key}>
                 <button type="button" onClick={() => sortFn(key as SortKey<T>)}>
                   {key}
@@ -60,9 +63,9 @@ describe(useSorting.name, () => {
 
   beforeEach(() => {
     rows = [
-      { id: 1, a: 'A', b: 'B', c: 3 },
-      { id: 2, a: 'B', b: 'C', c: 1 },
-      { id: 3, a: 'C', b: 'A', c: 2 },
+      { id: 1, a: 'A', b: 'B', c: 3, d: { x: 1, y: 2 } },
+      { id: 2, a: 'B', b: 'C', c: 1, d: { x: 2, y: 3 } },
+      { id: 3, a: 'C', b: 'A', c: 2, d: { x: 3, y: 1 } },
     ];
   });
 
@@ -73,11 +76,18 @@ describe(useSorting.name, () => {
     ['b' as SortKey<T>, 'down' as SortDir, [2, 1, 3]],
     ['c' as SortKey<T>, 'up' as SortDir, [2, 3, 1]],
     ['c' as SortKey<T>, 'down' as SortDir, [1, 3, 2]],
+    ['d' as SortKey<T>, 'up' as SortDir, [1, 2, 3]],
+    ['d' as SortKey<T>, 'down' as SortDir, [3, 2, 1]],
   ])(
     'should sort by the default sortKey and sortDir as expected (key=%s, dir=%s)',
     (key: SortKey<T>, dir: SortDir, expected: number[]) => {
       render(
-        <TestComponent rows={rows} defaultSortKey={key} defaultSortDir={dir} />,
+        <TestComponent
+          data={rows}
+          defaultSortKey={key}
+          defaultSortDir={dir}
+          compareFns={{ d: (a, b) => a.x - b.x }}
+        />,
       );
 
       const results: number[] = [];
@@ -98,12 +108,18 @@ describe(useSorting.name, () => {
     ['a' as SortKey<T>, [1, 2, 3]],
     ['b' as SortKey<T>, [3, 1, 2]],
     ['c' as SortKey<T>, [2, 3, 1]],
+    ['d' as SortKey<T>, [1, 2, 3], (a: T['d'], b: T['d']) => a.x - b.x],
+    ['d' as SortKey<T>, [3, 1, 2], (a: T['d'], b: T['d']) => a.y - b.y],
   ])(
     'should sort the data as expected',
-    async (key: SortKey<T>, expected: number[]) => {
+    async (
+      key: SortKey<T>,
+      expected: number[],
+      dCompareFn?: CompareFn<T['d']>,
+    ) => {
       const user = userEvent.setup();
 
-      render(<TestComponent rows={rows} />);
+      render(<TestComponent data={rows} compareFns={{ d: dCompareFn }} />);
 
       const button = screen.getByRole('button', { name: key });
       await user.click(button);
@@ -129,12 +145,18 @@ describe(useSorting.name, () => {
     ['c' as SortKey<T>, 1, [2, 3, 1]],
     ['c' as SortKey<T>, 2, [1, 3, 2]],
     ['c' as SortKey<T>, 3, [1, 2, 3]], // default state of rows
+
+    ['d' as SortKey<T>, 1, [3, 1, 2]],
+    ['d' as SortKey<T>, 2, [2, 1, 3]],
+    ['d' as SortKey<T>, 3, [1, 2, 3]], // default state of rows
   ])(
     'should sort in the order: up > down > default when sortFn() called 3 times on same key (key=%s, clicks=%s)',
     async (key: SortKey<T>, clicks: number, expected: number[]) => {
       const user = userEvent.setup();
 
-      render(<TestComponent rows={rows} />);
+      render(
+        <TestComponent data={rows} compareFns={{ d: (a, b) => a.y - b.y }} />,
+      );
 
       const button = screen.getByRole('button', { name: key });
 

@@ -11,35 +11,47 @@ export type SortKey<T> = keyof T;
 export type SortDir = 'up' | 'down';
 
 /**
- * Defines the sort value used for sorting a value.
+ * A function that determines the relative sort order of its two arguments. The
+ * function should return the following values:
+ * ```
+ * if (a < b) return x; // x < 0
+ * if (a > b) return y; // y > 0
+ * if (a == b) return 0;
+ * ```
  */
-export interface SortValue<V> {
-  value: V;
-  sortValue: any;
-}
+export type CompareFn<V> = (a: V, b: V) => number;
 
 /**
- * A type of object capable of being sorted. Convert any property that cannot
- * be sorted in its raw form to a {@link SortValue} as per the example below.
+ * An object assigning an optional {@link CompareFn} to each property of `T`.
  *
  * @example
- * The following data type has the property `name` as an object. To ensure that
- * this property is sorted by `lastName`, convert it as follows:
+ * ```
+ * type Person = {
+ *   name: {
+ *     first: string;
+ *     last: string;
+ *   };
+ *   age: number;
+ *   address: {
+ *     street: string;
+ *     city: string;
+ *     state: string;
+ *     zip: number;
+ *   }
+ * }
  *
- * before: {
- *  age: 8,
- *  name: { firstName: 'Joe', lastName: 'Schmoe' }
+ * const compareFns: CompareFns<Person> = {
+ *   name: (a, b) => {
+ *     if (a.last < b.last) return -1;
+ *     if (a.last > b.last) return 1;
+ *     return 0;
+ *   },
+ *   address: (a, b) => a.zip - b.zip
  * }
- * after: {
- *  age: 8,
- *  name: {
- *    value: { firstName: 'Joe', lastName: 'Schmoe' },
- *    sortValue: 'Schmoe'
- *  }
- * }
+ * ```
  */
-export type Sortable<T> = {
-  [K in SortKey<T>]: T[K] | SortValue<T[K]>;
+export type CompareFns<T> = {
+  [K in SortKey<T>]?: CompareFn<T[K]>;
 };
 
 /**
@@ -61,6 +73,16 @@ export type Sortable<T> = {
 export type SortFn<T> = (sortKey?: SortKey<T>) => void;
 
 /**
+ * Props for the {@link useSorting} hook.
+ */
+export interface UseSortingProps<T> {
+  data: T[];
+  defaultSortKey?: SortKey<T>;
+  defaultSortDir?: SortDir;
+  compareFns?: CompareFns<T>;
+}
+
+/**
  * The return type of the {@link useSorting} hook.
  */
 export type SortingUtils<T> = [
@@ -71,45 +93,33 @@ export type SortingUtils<T> = [
 ];
 
 /**
- * Returns a compare function used as an argument for the Arrays.sort function.
+ * Provides utilities for sorting data.
  *
- * @param key The sort key used for ordering.
- * @param dir The direction of the sort.
- * @returns A compare function.
+ * @param props {@link UseSortingProps}
+ * @returns A {@link SortingUtils}.
  */
-function compareFn<T>(key: SortKey<T>, dir: SortDir) {
-  return (a: Sortable<T>, b: Sortable<T>) => {
+export function useSorting<T>({
+  data,
+  defaultSortKey,
+  defaultSortDir,
+  compareFns,
+}: UseSortingProps<T>): SortingUtils<T> {
+  const compareFn = (key: SortKey<T>, dir: SortDir) => (a: T, b: T) => {
     const flip = dir === 'down' ? -1 : 1;
+    const sortA = a[key];
+    const sortB = b[key];
+    const compFn = compareFns?.[key];
 
-    const sortA = (a[key] as SortValue<T[SortKey<T>]>)?.sortValue ?? a[key];
-    const sortB = (b[key] as SortValue<T[SortKey<T>]>)?.sortValue ?? b[key];
-
+    if (compFn) return compFn(sortA, sortB) * flip;
     if (sortA < sortB) return -1 * flip;
     if (sortA > sortB) return 1 * flip;
     return 0;
   };
-}
 
-/**
- * Provides utilities for sorting data. The rows are sorted based on the value
- * at `rows[i][sortKey]`, unless a `sortValue` property is present on that
- * value (`rows[i][sortKey].sortValue`), in which case the row is sorted based
- * on that sort value instead.
- *
- * @param data The data to sort.
- * @param defaultSortKey The initial sort key used for ordering.
- * @param defaultSortDir The initial direction of the sort.
- * @returns A {@link SortingUtils}.
- */
-export function useSorting<T>(
-  data: Sortable<T>[],
-  defaultSortKey?: SortKey<T>,
-  defaultSortDir?: SortDir,
-): SortingUtils<T> {
   const [sort, setSort] = useState<{
     key?: SortKey<T>;
     dir?: SortDir;
-    sorted: Sortable<T>[];
+    sorted: T[];
   }>(() => ({
     key: defaultSortKey,
     dir: defaultSortDir,
@@ -143,19 +153,5 @@ export function useSorting<T>(
     });
   };
 
-  // Transform data from Sortable<T>[] to T[]
-  const sorted: T[] = sort.sorted.map((item) => {
-    const t = {} as T;
-
-    Object.entries(item).forEach(([k, v]) => {
-      t[k as SortKey<T>] =
-        typeof v === 'object' && 'value' in (v as SortValue<T[SortKey<T>]>)
-          ? (v as SortValue<T[SortKey<T>]>).value
-          : (v as T[SortKey<T>]);
-    });
-
-    return t;
-  });
-
-  return [sort.key, sort.dir, sortFn, sorted];
+  return [sort.key, sort.dir, sortFn, sort.sorted];
 }
