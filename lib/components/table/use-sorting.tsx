@@ -127,7 +127,7 @@ export function useSorting<T>({
     key: defaultSortKey,
     dir: defaultSortDir,
     sorted:
-      defaultSortKey && defaultSortDir
+      defaultSortKey != null && defaultSortDir != null
         ? structuredClone(data).sort(compareFn(defaultSortKey, defaultSortDir))
         : structuredClone(data),
   }));
@@ -135,7 +135,7 @@ export function useSorting<T>({
   const sortFn: SortFn<T> = useCallback(
     (sortKey?: SortKey<T>) => {
       setSort(({ key, dir, sorted }) => {
-        if (!sortKey || (sortKey === key && dir === 'down')) {
+        if (sortKey == null || (sortKey === key && dir === 'down')) {
           return {
             sorted: structuredClone(data),
           };
@@ -162,7 +162,7 @@ export function useSorting<T>({
       key,
       dir,
       sorted:
-        key && dir
+        key != null && dir != null
           ? structuredClone(data).sort(compareFn(key, dir))
           : structuredClone(data),
     }));

@@ -45,12 +45,12 @@ export function TableHeader<T>({
     <thead id={id} className={clsx(styles.tableHeader, className)}>
       <tr className={styles.tableHeaderTr}>
         {cells.map(({ content, key }, i) => {
-          const sortable = key && sortFn;
+          const sortable = key != null && !!sortFn;
           const active = sortKey === key;
           return (
             <th
               key={i}
-              className={sortable && styles.sortable}
+              className={sortable ? styles.sortable : undefined}
               onClick={sortable ? () => sortFn(key) : undefined}
             >
               {content}
