@@ -1,14 +1,14 @@
 import styles from './table.module.scss';
 import { ReactNode } from 'react';
 import clsx from 'clsx';
-import { SortDir, SortKey } from './use-sorting';
+import { SortDir, SortFn, SortKey } from './use-sorting';
 
 /**
  * Props for a cell in the {@link TableHeader} component.
  */
 export interface HeaderCell<T> {
   content: ReactNode;
-  key?: keyof T;
+  key?: SortKey<T>;
 }
 
 /**
@@ -20,7 +20,7 @@ export interface TableHeaderProps<T> {
   cells: HeaderCell<T>[];
   sortKey?: SortKey<T>;
   sortDir?: SortDir;
-  sortFn?: (sortKey: SortKey<T>) => void;
+  sortFn?: SortFn<T>;
   collapseCarets?: boolean;
 }
 
@@ -45,12 +45,12 @@ export function TableHeader<T>({
     <thead id={id} className={clsx(styles.tableHeader, className)}>
       <tr className={styles.tableHeaderTr}>
         {cells.map(({ content, key }, i) => {
-          const sortable = key && sortFn;
+          const sortable = key != null && !!sortFn;
           const active = sortKey === key;
           return (
             <th
               key={i}
-              className={sortable && styles.sortable}
+              className={sortable ? styles.sortable : undefined}
               onClick={sortable ? () => sortFn(key) : undefined}
             >
               {content}

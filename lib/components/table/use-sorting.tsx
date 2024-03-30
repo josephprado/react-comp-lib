@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * A valid sort key for type T.
@@ -104,17 +104,20 @@ export function useSorting<T>({
   defaultSortDir,
   compareFns,
 }: UseSortingProps<T>): SortingUtils<T> {
-  const compareFn = (key: SortKey<T>, dir: SortDir) => (a: T, b: T) => {
-    const flip = dir === 'down' ? -1 : 1;
-    const sortA = a[key];
-    const sortB = b[key];
-    const compFn = compareFns?.[key];
+  const compareFn = useCallback(
+    (key: SortKey<T>, dir: SortDir) => (a: T, b: T) => {
+      const flip = dir === 'down' ? -1 : 1;
+      const sortA = a[key];
+      const sortB = b[key];
+      const compFn = compareFns?.[key];
 
-    if (compFn) return compFn(sortA, sortB) * flip;
-    if (sortA < sortB) return -1 * flip;
-    if (sortA > sortB) return 1 * flip;
-    return 0;
-  };
+      if (compFn) return compFn(sortA, sortB) * flip;
+      if (sortA < sortB) return -1 * flip;
+      if (sortA > sortB) return 1 * flip;
+      return 0;
+    },
+    [compareFns],
+  );
 
   const [sort, setSort] = useState<{
     key?: SortKey<T>;
@@ -124,34 +127,46 @@ export function useSorting<T>({
     key: defaultSortKey,
     dir: defaultSortDir,
     sorted:
-      defaultSortKey && defaultSortDir
+      defaultSortKey != null && defaultSortDir != null
         ? structuredClone(data).sort(compareFn(defaultSortKey, defaultSortDir))
         : structuredClone(data),
   }));
 
-  const sortFn: SortFn<T> = (sortKey?: SortKey<T>) => {
-    setSort(() => {
-      const { key, dir, sorted } = sort;
+  const sortFn: SortFn<T> = useCallback(
+    (sortKey?: SortKey<T>) => {
+      setSort(({ key, dir, sorted }) => {
+        if (sortKey == null || (sortKey === key && dir === 'down')) {
+          return {
+            sorted: structuredClone(data),
+          };
+        } else if (sortKey === key && dir === 'up') {
+          return {
+            key: sortKey,
+            dir: 'down',
+            sorted: sorted.sort(compareFn(sortKey, 'down')),
+          };
+        } else {
+          return {
+            key: sortKey,
+            dir: 'up',
+            sorted: sorted.sort(compareFn(sortKey, 'up')),
+          };
+        }
+      });
+    },
+    [compareFn, data],
+  );
 
-      if (!sortKey || (sortKey === key && dir === 'down')) {
-        return {
-          sorted: structuredClone(data),
-        };
-      } else if (sortKey === key && dir === 'up') {
-        return {
-          key: sortKey,
-          dir: 'down',
-          sorted: sorted.sort(compareFn(sortKey, 'down')),
-        };
-      } else {
-        return {
-          key: sortKey,
-          dir: 'up',
-          sorted: sorted.sort(compareFn(sortKey, 'up')),
-        };
-      }
-    });
-  };
+  useEffect(() => {
+    setSort(({ key, dir }) => ({
+      key,
+      dir,
+      sorted:
+        key != null && dir != null
+          ? structuredClone(data).sort(compareFn(key, dir))
+          : structuredClone(data),
+    }));
+  }, [compareFn, data]);
 
   return [sort.key, sort.dir, sortFn, sort.sorted];
 }
