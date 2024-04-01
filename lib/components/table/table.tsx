@@ -9,6 +9,7 @@ export interface TableProps {
   id?: string;
   className?: string;
   numCols: number;
+  stableScrollbarGutter?: boolean;
 }
 
 /**
@@ -21,12 +22,17 @@ export function Table({
   id,
   className,
   numCols,
+  stableScrollbarGutter = false,
   children,
 }: PropsWithChildren<TableProps>) {
   return (
     <table
       id={id}
-      className={clsx(styles.table, className)}
+      className={clsx(
+        styles.table,
+        stableScrollbarGutter && styles.stableScrollbarGutter,
+        className,
+      )}
       style={{ '--numCols': numCols } as CSSProperties}
     >
       {children}

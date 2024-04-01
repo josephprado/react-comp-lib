@@ -122,6 +122,7 @@ export function TableDemo() {
           <Table
             numCols={3}
             className={clsx(styles.table, styles.scrollableTable)}
+            stableScrollbarGutter
           >
             <TableHeader<Employee>
               className={clsx(styles.tableHeader, styles.scrollableTableHeader)}
