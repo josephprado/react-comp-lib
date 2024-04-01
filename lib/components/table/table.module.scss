@@ -2,6 +2,24 @@
   $numCols: var(--numCols);
   display: grid;
   grid-template-columns: repeat($numCols, 1fr);
+  height: fit-content;
+
+  &:has(.tableHeader) {
+    grid-template-rows: auto 1fr auto;
+  }
+
+  /*
+    Add an extra column that occupies the width of the scrollbar so that the
+    effective last column maintains its integrity.
+  */
+  &.stableScrollbarGutter {
+    grid-template-columns: repeat($numCols, 1fr) auto;
+
+    .tableHeader {
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+  }
 
   .tableHeader,
   .tableHeaderTr,
@@ -11,12 +29,7 @@
   .tableFooterTr {
     display: grid;
     grid-template-columns: subgrid;
-    /*
-      Add an extra column. This column is normally hidden, but when the
-      scrollbar is visible, it occupies the width of the scrollbar so that the
-      effective last column maintains its integrity.
-    */
-    grid-column: 1 / span calc($numCols + 1);
+    grid-column: 1 / -1;
   }
 
   .tableBody {

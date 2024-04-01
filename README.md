@@ -559,6 +559,15 @@ Specifies the number of columns in the table.
 
 ---
 
+##### `stableScrollbarGutter`
+
+Adds right-padding to the last column to account for the width of a scrollbar and prevent content shifting.
+
+- type: boolean
+- default: false
+
+---
+
 ##### TableHeader
 
 ##### `id`
