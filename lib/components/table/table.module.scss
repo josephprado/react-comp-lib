@@ -16,8 +16,10 @@
     grid-template-columns: repeat($numCols, 1fr) auto;
 
     .tableHeader {
-      overflow-y: auto;
       scrollbar-gutter: stable;
+      overflow-y: auto;
+      // Prevents X-scrollbar when columns are minmax(0, 1fr) and constrained.
+      overflow-x: hidden;
     }
   }
 
@@ -35,7 +37,7 @@
   .tableBody {
     grid-auto-rows: min-content;
     overflow-y: auto;
-    // Prevents X-scrollbar when Y-scrollbar is visible (in Firefox).
+    // Prevents X-scrollbar when Y-scrollbar is visible.
     overflow-x: hidden;
   }
 }
