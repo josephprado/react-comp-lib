@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HeaderCell, TableHeader } from './table-header';
-import { SortDir, SortKey } from './use-sorting';
+import { SortDir, SortKey } from '../../hooks/use-sorting/use-sorting';
 
 interface T {
   a: any;

@@ -8,7 +8,7 @@ import {
   useSorting,
 } from '../../../lib/main';
 import { HeaderCell } from '../../../lib/components/table/table-header';
-import { CompareFns } from '../../../lib/components/table/use-sorting';
+import { CompareFns } from '../../../lib/hooks/use-sorting/use-sorting';
 
 interface Employee {
   name: { first: string; last: string };

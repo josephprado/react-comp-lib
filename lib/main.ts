@@ -7,10 +7,10 @@ export { TableHeader } from './components/table/table-header';
 export { TableBody } from './components/table/table-body';
 export { TableFooter } from './components/table/table-footer';
 export { TableRow } from './components/table/table-row';
-export { useSorting } from './components/table/use-sorting';
 
 // HOOKS
 export { useDataEditing } from './hooks/use-data-editing/use-data-editing';
+export { useSorting } from './hooks/use-sorting/use-sorting';
 export { useWizard } from './hooks/use-wizard/use-wizard';
 
 // UTILITIES
