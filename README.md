@@ -729,7 +729,7 @@ import {
   useSorting,
 } from '@portfolijo/react-comp-lib';
 import { HeaderCell } from '@portfolijo/react-comp-lib/dist/components/table/table-header';
-import { CompareFns } from '@portfolijo/react-comp-lib/dist/components/table/use-sorting';
+import { CompareFns } from '@portfolijo/react-comp-lib/dist/hooks/use-sorting/use-sorting';
 
 interface Employee {
   name: { first: string; last: string };
