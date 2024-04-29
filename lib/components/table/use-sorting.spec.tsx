@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, renderHook } from '@testing-library/react';
 import {
   CompareFn,
   SortDir,
@@ -8,6 +7,8 @@ import {
   UseSortingProps,
   useSorting,
 } from './use-sorting';
+
+const [SORT_KEY, SORT_DIR, SORT_FN, SORTED_DATA] = [0, 1, 2, 3] as const;
 
 interface T {
   id: number;
@@ -18,45 +19,9 @@ interface T {
   z: { x: number; y: number };
 }
 
-function TestComponent({
-  data,
-  defaultSortKey,
-  defaultSortDir,
-  compareFns,
-}: UseSortingProps<T>) {
-  const [sortKey, sortDir, sortFn, sortedRows] = useSorting<T>({
-    data,
-    defaultSortKey,
-    defaultSortDir,
-    compareFns,
-  });
-
-  return (
-    <>
-      <div data-testid="sort-key">{sortKey}</div>
-      <div data-testid="sort-dir">{sortDir}</div>
-      <table>
-        <thead>
-          <tr>
-            {['a', 'b', 0, '', 'z'].map((key) => (
-              <th key={key}>
-                <button type="button" onClick={() => sortFn(key as SortKey<T>)}>
-                  {key}
-                </button>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedRows.map(({ id }, i) => (
-            <tr key={id}>
-              <td data-testid={`row${i}`}>{id}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
-  );
+// See https://stackoverflow.com/questions/65676728/useeffect-infinite-loop-occurs-only-while-testing-not-otherwise-despite-using
+function renderUseSortingHook(props: UseSortingProps<T>) {
+  return renderHook(() => useSorting<T>(props));
 }
 
 describe(useSorting.name, () => {
@@ -84,26 +49,15 @@ describe(useSorting.name, () => {
   ])(
     'should sort by the default sortKey and sortDir as expected (key=%s, dir=%s)',
     (key: SortKey<T>, dir: SortDir, expected: number[]) => {
-      render(
-        <TestComponent
-          data={rows}
-          defaultSortKey={key}
-          defaultSortDir={dir}
-          compareFns={{ z: (a, b) => a.x - b.x }}
-        />,
-      );
-
-      const results: number[] = [];
-
-      for (let i = 0; i < rows.length; i++)
-        results.push(+screen.getByTestId(`row${i}`).innerHTML);
-
-      const sortKey = screen.getByTestId('sort-key').innerHTML;
-      const sortDir = screen.getByTestId('sort-dir').innerHTML;
-
-      expect(results).toEqual(expected);
-      expect(sortKey).toEqual(key.toString());
-      expect(sortDir).toEqual(dir);
+      const { result } = renderUseSortingHook({
+        data: rows,
+        defaultSortKey: key,
+        defaultSortDir: dir,
+        compareFns: { z: (a, b) => a.x - b.x },
+      });
+      expect(result.current[SORT_KEY]).toEqual(key);
+      expect(result.current[SORT_DIR]).toEqual(dir);
+      expect(result.current[SORTED_DATA].map(({ id }) => id)).toEqual(expected);
     },
   );
 
@@ -116,24 +70,13 @@ describe(useSorting.name, () => {
     ['z' as SortKey<T>, [3, 1, 2], (a: T['z'], b: T['z']) => a.y - b.y],
   ])(
     'should sort the data as expected',
-    async (
-      key: SortKey<T>,
-      expected: number[],
-      zCompareFn?: CompareFn<T['z']>,
-    ) => {
-      const user = userEvent.setup();
-
-      render(<TestComponent data={rows} compareFns={{ z: zCompareFn }} />);
-
-      const button = screen.getByRole('button', { name: key as string });
-      await user.click(button);
-
-      const results = [];
-
-      for (let i = 0; i < rows.length; i++)
-        results.push(+screen.getByTestId(`row${i}`).innerHTML);
-
-      expect(results).toEqual(expected);
+    (key: SortKey<T>, expected: number[], zCompareFn?: CompareFn<T['z']>) => {
+      const { result } = renderUseSortingHook({
+        data: rows,
+        compareFns: { z: zCompareFn },
+      });
+      act(() => result.current[SORT_FN](key));
+      expect(result.current[SORTED_DATA].map(({ id }) => id)).toEqual(expected);
     },
   );
 
@@ -159,23 +102,15 @@ describe(useSorting.name, () => {
     ['z' as SortKey<T>, 3, [1, 2, 3]], // default state of rows
   ])(
     'should sort in the order: up > down > default when sortFn() called 3 times on same key (key=%s, clicks=%s)',
-    async (key: SortKey<T>, clicks: number, expected: number[]) => {
-      const user = userEvent.setup();
-
-      render(
-        <TestComponent data={rows} compareFns={{ z: (a, b) => a.y - b.y }} />,
-      );
-
-      const button = screen.getByRole('button', { name: key as string });
-
-      for (let i = 0; i < clicks; i++) await user.click(button);
-
-      const results = [];
-
-      for (let i = 0; i < rows.length; i++)
-        results.push(+screen.getByTestId(`row${i}`).innerHTML);
-
-      expect(results).toEqual(expected);
+    (key: SortKey<T>, clicks: number, expected: number[]) => {
+      const { result } = renderUseSortingHook({
+        data: rows,
+        compareFns: { z: (a, b) => a.y - b.y },
+      });
+      act(() => {
+        for (let i = 0; i < clicks; i++) result.current[SORT_FN](key);
+      });
+      expect(result.current[SORTED_DATA].map(({ id }) => id)).toEqual(expected);
     },
   );
 });
