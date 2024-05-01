@@ -4,6 +4,9 @@ import { OutsideClickHandlerDemo } from './outside-click-handler-demo/outside-cl
 import { TableDemo } from './table-demo/table-demo';
 import { FormatTelUSADemo } from './format-tel-usa-demo/format-tel-usa-demo';
 import { ModalDemo } from './modal-demo/modal-demo';
+import { UseDataEditingDemo } from './use-data-edtiting-demo/use-data-editing-demo';
+import { UseFilteringDemo } from './use-filtering-demo/use-filtering-demo';
+import { UseWizardDemo } from './use-wizard-demo/use-wizard-demo';
 
 function App() {
   return (
@@ -14,6 +17,9 @@ function App() {
       <TableDemo />
       <FormatTelUSADemo />
       <ModalDemo />
+      <UseDataEditingDemo />
+      <UseFilteringDemo />
+      <UseWizardDemo />
     </div>
   );
 }
