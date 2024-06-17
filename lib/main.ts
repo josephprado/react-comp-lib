@@ -10,6 +10,7 @@ export { TableRow } from './components/table/table-row';
 
 // HOOKS
 export { useDataEditing } from './hooks/use-data-editing/use-data-editing';
+export { useDebounce } from './hooks/use-debounce/use-debounce';
 export { useFiltering } from './hooks/use-filtering/use-filtering';
 export { useSorting } from './hooks/use-sorting/use-sorting';
 export { useWizard } from './hooks/use-wizard/use-wizard';
