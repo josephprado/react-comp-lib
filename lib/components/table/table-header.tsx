@@ -1,7 +1,11 @@
 import styles from './table.module.scss';
 import { ReactNode } from 'react';
 import clsx from 'clsx';
-import { SortDir, SortFn, SortKey } from '../../hooks/use-sorting/use-sorting';
+import type {
+  SortDir,
+  SortFn,
+  SortKey,
+} from '../../hooks/use-sorting/use-sorting';
 
 /**
  * Props for a cell in the {@link TableHeader} component.
