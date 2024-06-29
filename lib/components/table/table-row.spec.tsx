@@ -29,6 +29,23 @@ describe(TableRow.name, () => {
     expect(cells).toEqual(rowCells.map((x) => x.toString()));
   });
 
+  it('should render children', () => {
+    render(
+      <TableRow>
+        <td>Foo</td>
+        <td>Bar</td>
+        <td>Baz</td>
+      </TableRow>,
+    );
+    const foo = screen.getByText('Foo');
+    const bar = screen.getByText('Bar');
+    const baz = screen.getByText('Baz');
+
+    expect(foo).toBeInTheDocument();
+    expect(bar).toBeInTheDocument();
+    expect(baz).toBeInTheDocument();
+  });
+
   it('should call onRowClick() when the row is clicked', async () => {
     const mockOnRowClick = vi.fn();
     const user = userEvent.setup();
