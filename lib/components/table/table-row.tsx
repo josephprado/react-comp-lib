@@ -5,29 +5,44 @@ import clsx from 'clsx';
 /**
  * Props for the {@link TableRow} component.
  */
-export interface TableRowProps {
+export type TableRowProps = {
   id?: string | number;
   className?: string;
-  cells: ReactNode[];
   onRowClick?: (event: any, key?: string | number) => void;
-}
+} & (
+  | {
+      cells: ReactNode[];
+      children?: never;
+    }
+  | {
+      children: ReactNode;
+      cells?: never;
+    }
+);
 
 /**
- * A row of a table.
+ * A row of a table. Accepts either
+ *
+ * - `cells`: an array of nodes. Each item  will be automatically wrapped in a `<td>`.
+ * - `children`: rendered as is. Direct children must be wrapped in a `<td>`.
  *
  * @param props {@link TableRowProps}
  * @returns A JSX element.
  */
-export function TableRow({ id, className, cells, onRowClick }: TableRowProps) {
+export function TableRow({
+  id,
+  className,
+  onRowClick,
+  cells,
+  children,
+}: TableRowProps) {
   return (
     <tr
       id={id?.toString()}
       className={clsx(styles.tableRow, className)}
       onClick={onRowClick ? (event) => onRowClick(event, id) : undefined}
     >
-      {cells.map((content, i) => (
-        <td key={i}>{content}</td>
-      ))}
+      {cells?.map((content, i) => <td key={i}>{content}</td>) ?? children}
     </tr>
   );
 }

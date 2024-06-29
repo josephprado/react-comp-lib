@@ -10,7 +10,8 @@
       background-color: lightgray;
     }
 
-    .tableRow:nth-of-type(even) {
+    .tableRow:nth-of-type(even),
+    tr:nth-of-type(even) {
       background-color: whitesmoke;
     }
 

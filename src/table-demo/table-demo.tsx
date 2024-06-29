@@ -161,6 +161,24 @@ export function TableDemo() {
             />
           </Table>
         </ExampleContainer>
+
+        <ExampleContainer title="TableRow Children">
+          <Table numCols={3} className={styles.table}>
+            <TableHeader<Employee>
+              className={styles.tableHeader}
+              cells={headers}
+            />
+            <TableBody>
+              {data.map(({ name, age, department }) => (
+                <TableRow key={name}>
+                  <td>{name}</td>
+                  <td>{age}</td>
+                  <td>{department}</td>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </ExampleContainer>
       </div>
     </DemoSection>
   );
