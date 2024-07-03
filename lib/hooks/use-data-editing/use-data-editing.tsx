@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, useState } from 'react';
 
 /**
  * The return type of the {@link useDataEditing} hook.
@@ -13,6 +13,12 @@ export interface DataEditingUtils<T extends object = any> {
    * An object containing updated values of the data.
    */
   updates: Partial<T>;
+
+  /**
+   * A setter function for `updates`. To update individual properties
+   * separately, use `updateValue` instead.
+   */
+  setUpdates: Dispatch<React.SetStateAction<Partial<T>>>;
 
   /**
    * Sets the named property in `updates`.
@@ -62,5 +68,12 @@ export function useDataEditing<T extends object = any>(): DataEditingUtils<T> {
     setUpdates({});
   };
 
-  return { editing, updates, updateValue, openEditMode, cancelEditMode };
+  return {
+    editing,
+    updates,
+    setUpdates,
+    updateValue,
+    openEditMode,
+    cancelEditMode,
+  };
 }
