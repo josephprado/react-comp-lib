@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, useState } from 'react';
 
 /**
  * The return type of the {@link useWizard} hook.
@@ -8,6 +8,12 @@ export interface WizardUtils<T extends object = any> {
    * An object storing data used by the wizard component.
    */
   values: Partial<T>;
+
+  /**
+   * A setter function for `values`. To set individual properties
+   * separately, use `setValue` instead.
+   */
+  setValues: Dispatch<React.SetStateAction<Partial<T>>>;
 
   /**
    * Sets the named property in `values`.
@@ -68,5 +74,5 @@ export function useWizard<T extends object = any>(): WizardUtils<T> {
     setStepIndex(0);
   };
 
-  return { values, setValue, stepIndex, prevStep, nextStep, reset };
+  return { values, setValues, setValue, stepIndex, prevStep, nextStep, reset };
 }
