@@ -129,18 +129,44 @@ describe(validateString.name, () => {
   );
 
   it.each([
-    ['a', [{ test: (_x: string) => true, name: '' }], false],
-    ['a ', [{ test: (_x: string) => true, name: '' }], false],
-    [' a', [{ test: (_x: string) => true, name: '' }], false],
-    [' a ', [{ test: (_x: string) => true, name: '' }], false],
-    ['', [{ test: (_x: string) => true, name: '' }], true],
-    [' ', [{ test: (_x: string) => true, name: '' }], true],
-    ['  ', [{ test: (_x: string) => true, name: '' }], true],
+    ['a', false],
+    ['a ', false],
+    [' a', false],
+    [' a ', false],
+    ['', true],
+    [' ', true],
+    ['  ', true],
   ])(
     'should test for non-empty strings when notEmpty prop is true',
-    (str: string, criteria: Criteria[], isEmpty: boolean) => {
-      const empty = validateString({ str, criteria, notEmpty: true }) !== null;
+    (str: string, isEmpty: boolean) => {
+      const empty =
+        validateString({ str, criteria: [], notEmpty: true }) !== null;
       expect(empty).toEqual(isEmpty);
+    },
+  );
+
+  it.each([
+    ['a', '', false],
+    ['a', 'foo', false],
+    ['a ', '', false],
+    ['a ', 'foo', false],
+    [' a', '', false],
+    [' a', 'foo', false],
+    [' a ', '', false],
+    [' a ', 'foo', false],
+    ['', '', true],
+    ['', 'foo', true],
+    [' ', '', true],
+    [' ', 'foo', true],
+    ['  ', '', true],
+    ['  ', 'foo', true],
+  ])(
+    'should test for non-empty strings when notEmpty prop is a string',
+    (str: string, notEmpty: string, isEmpty: boolean) => {
+      const error = validateString({ str, criteria: [], notEmpty });
+
+      if (isEmpty) expect(error).toEqual([notEmpty]);
+      else expect(error).toBeNull();
     },
   );
 });
