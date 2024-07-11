@@ -34,10 +34,19 @@ export interface ValidateStringProps {
   criteria: Criteria[];
 
   /**
-   * If true, adds a criteria that checks that `str` is not empty whitespace.
-   * If this criteria fails, all remaining criteria are skipped.
+   * If true, prepends a stopOnFail criteria that checks that `str` is not
+   * empty whitespace. Optionally pass a string instead of true to override the
+   * default error message of `'not be empty'`.
    */
-  notEmpty?: boolean;
+  notEmpty?: boolean | string;
+}
+
+function notEmptyCriteria(name: string): Criteria {
+  return {
+    test: (x) => !!x?.trim().length,
+    name,
+    stopOnFail: true,
+  };
 }
 
 /**
@@ -52,16 +61,15 @@ export function validateString({
   criteria,
   notEmpty,
 }: ValidateStringProps): string[] | null {
-  const criteriaList: Criteria[] = notEmpty
-    ? [
-        {
-          test: (x) => !!x?.trim().length,
-          name: 'not be empty',
-          stopOnFail: true,
-        },
-        ...criteria,
-      ]
-    : criteria;
+  let criteriaList: Criteria[] = [];
+
+  if (typeof notEmpty === 'string') {
+    criteriaList = [notEmptyCriteria(notEmpty), ...criteria];
+  } else if (notEmpty) {
+    criteriaList = [notEmptyCriteria('not be empty'), ...criteria];
+  } else {
+    criteriaList = criteria;
+  }
 
   const errors: string[] = [];
 
